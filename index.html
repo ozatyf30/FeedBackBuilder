@@ -838,7 +838,73 @@
      You can add as many comments as you want to any question
      without changing the JavaScript functions.
      ========================================================= */
+const cameraComments = {
+  good: [
+    "kept the camera on throughout the session",
+    "kept the camera on during the session",
+    "kept the camera on throughout the training",
+    "kept the camera on consistently during the session",
+    "had the camera on throughout the training session",
+    "maintained the camera on during the sessions",
+    "kept the camera on during the training activities",
+    "kept the camera on for the full session",
+    "maintained the camera on throughout the session",
+    "kept the camera on during the training",
+    "had the camera on consistently during the sessions",
+    "kept the camera on during the different activities",
+    "maintained the camera on during the training session",
+    "kept the camera on throughout the activities",
+    "had the camera on for the duration of the session",
+    "kept the camera on consistently during training",
+    "maintained the camera on during the session activities",
+    "kept the camera on during the full training session",
+    "had the camera on throughout the session",
+    "kept the camera on during the practical activities",
+    "maintained the camera on consistently during training",
+    "kept the camera on throughout the different activities",
+    "had the camera on during the entire session",
+    "kept the camera on during all session activities",
+    "maintained the camera on throughout training",
+    "kept the camera on consistently throughout the session",
+    "had the camera on during the training activities",
+    "kept the camera on for the whole session",
+    "maintained the camera on during the full session",
+    "kept the camera on throughout the training activities"
+  ],
 
+  bad: [
+    "sometimes turned off the camera during the session",
+    "occasionally turned off the camera during the session",
+    "did not keep the camera on throughout the session",
+    "turned off the camera at times during training",
+    "occasionally had the camera turned off",
+    "sometimes kept the camera off during the session",
+    "turned the camera off during parts of the session",
+    "did not maintain the camera on throughout training",
+    "had the camera off at some points during the session",
+    "occasionally switched the camera off during training",
+    "turned off the camera during some session activities",
+    "did not keep the camera on consistently",
+    "had the camera turned off during part of the session",
+    "sometimes turned the camera off during activities",
+    "kept the camera off for parts of the training",
+    "occasionally turned off the camera during activities",
+    "did not maintain the camera on for the full session",
+    "turned the camera off at certain points during training",
+    "had some periods with the camera turned off",
+    "sometimes had the camera off during the session",
+    "turned off the camera during parts of training",
+    "did not keep the camera on during the entire session",
+    "occasionally kept the camera off during activities",
+    "had the camera off during some parts of the training",
+    "sometimes switched off the camera during the session",
+    "did not keep the camera on consistently during training",
+    "turned the camera off during some activities",
+    "occasionally had the camera off during the session",
+    "kept the camera off at certain points during training",
+    "showed some periods with the camera turned off"
+  ]
+};
   const feedbackQuestions = [
 
     {
@@ -2747,31 +2813,30 @@
      ========================================================= */
 
   function setCamera(
-    id,
-    value
-  ) {
+  id,
+  value
+) {
 
-    const trainee =
-      findTrainee(id);
+  const trainee =
+    findTrainee(id);
 
-
-    if (!trainee) {
-      return;
-    }
-
-
-    trainee.camera =
-      value;
-
-
-    saveData();
-
-    renderCardBody(id);
-
-    updatePreview(id);
-
+  if (!trainee) {
+    return;
   }
 
+  trainee.camera =
+    value;
+
+  // Clear the previous random camera comment
+  delete trainee.randomComments.camera;
+
+  saveData();
+
+  renderCardBody(id);
+
+  updatePreview(id);
+
+}
 
   /* =========================================================
      SET FEEDBACK ANSWER
@@ -3411,25 +3476,33 @@
     }
 
 
-    /* CAMERA */
+/* CAMERA */
 
-    if (
-      trainee.camera === "always"
-    ) {
+if (trainee.camera) {
 
-      parts.push(
-        "kept the camera on throughout the sessions"
-      );
+  const cameraType =
+    trainee.camera === "always"
+      ? "good"
+      : "bad";
 
-    } else if (
-      trainee.camera === "sometimes_off"
-    ) {
+  let cameraComment =
+    trainee.randomComments.camera;
 
-      parts.push(
-        "sometimes turned off the camera during sessions"
-      );
+  if (!cameraComment) {
 
-    }
+    cameraComment =
+getRandomFromPool(
+  `camera_${cameraType}`,
+  cameraComments[cameraType],
+  null
+)
+
+    trainee.randomComments.camera =
+      cameraComment;
+  }
+
+  parts.push(cameraComment);
+}
 
 
     /* FEEDBACK QUESTIONS */
@@ -4454,7 +4527,18 @@
 
             const randomComments = {};
 
+/* Load random camera comment */
 
+if (
+  trainee.camera &&
+  trainee.randomComments &&
+  trainee.randomComments.camera
+) {
+
+  randomComments.camera =
+    trainee.randomComments.camera;
+
+}
             feedbackQuestions.forEach(
               function(question) {
 
