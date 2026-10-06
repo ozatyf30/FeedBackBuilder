@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -162,10 +163,6 @@
       box-shadow: 0 3px 12px rgba(30, 45, 55, 0.04);
     }
 
-    /* =========================================================
-       TRAINEE HEADER
-       ========================================================= */
-
     .trainee-header {
       width: 100%;
       display: flex;
@@ -237,10 +234,6 @@
       display: block;
     }
 
-    /* =========================================================
-       BASIC FIELDS
-       ========================================================= */
-
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -280,10 +273,6 @@
     .name-field {
       grid-column: span 3;
     }
-
-    /* =========================================================
-       ATTENDANCE
-       ========================================================= */
 
     .attendance-section {
       border: 1px solid #e0e6e3;
@@ -358,10 +347,6 @@
       min-height: 16px;
     }
 
-    /* =========================================================
-       CAMERA
-       ========================================================= */
-
     .camera-section {
       border: 1px solid #e0e6e3;
       border-radius: 10px;
@@ -400,10 +385,6 @@
       border-color: #bcd3c3;
       background: #f5faf6;
     }
-
-    /* =========================================================
-       FEEDBACK QUESTIONS
-       ========================================================= */
 
     .feedback-section {
       border-top: 1px solid #e4e9e6;
@@ -488,10 +469,6 @@
       color: #78847f;
     }
 
-    /* =========================================================
-       FOLLOW-UP
-       ========================================================= */
-
     .follow-up {
       margin-top: 10px;
       padding: 11px;
@@ -538,10 +515,6 @@
       color: #8a5555;
     }
 
-    /* =========================================================
-       CUSTOM
-       ========================================================= */
-
     .custom-section {
       margin-top: 16px;
     }
@@ -557,10 +530,6 @@
     .custom-section textarea {
       min-height: 75px;
     }
-
-    /* =========================================================
-       PREVIEW
-       ========================================================= */
 
     .preview-section {
       margin-top: 16px;
@@ -595,10 +564,6 @@
       font-size: 14px;
     }
 
-    /* =========================================================
-       TOAST
-       ========================================================= */
-
     .toast {
       position: fixed;
       bottom: 24px;
@@ -620,10 +585,6 @@
       transform: translateY(0);
     }
 
-    /* =========================================================
-       RESPONSIVE
-       ========================================================= */
-
     @media (max-width: 800px) {
 
       .grid {
@@ -634,7 +595,6 @@
         grid-column: span 1;
       }
 
-      /* Keep Tardy and Absent side by side */
       .attendance-grid {
         grid-template-columns: 1fr 1fr;
         gap: 7px;
@@ -1418,8 +1378,6 @@ const cameraComments = {
     }
 
   ];
-
-
   /* =========================================================
      STORAGE
      ========================================================= */
@@ -1695,8 +1653,6 @@ const cameraComments = {
 
   /* =========================================================
      GET RANDOM COMMENT
-
-     Each question has its own good/bad pool.
      ========================================================= */
 
   function getRandomComment(
@@ -1733,8 +1689,6 @@ const cameraComments = {
 
   /* =========================================================
      GET RANDOM PERFORMANCE COMMENT
-
-     Understanding follow-up has its own independent pools.
      ========================================================= */
 
   function getRandomPerformanceComment(
@@ -2666,10 +2620,28 @@ const cameraComments = {
               "";
 
 
+            const firstLabel =
+              answer === "good"
+                ? "Good Performance"
+                : "Bad Performance";
+
+
             const secondLabel =
               answer === "good"
                 ? "Started weak and improved"
                 : "Started good and declined";
+
+
+            const firstValue =
+              answer === "good"
+                ? "good_performance"
+                : "bad_performance";
+
+
+            const secondValue =
+              answer === "good"
+                ? "improved"
+                : "declined";
 
 
             followUpHTML = `
@@ -2686,7 +2658,7 @@ const cameraComments = {
                   <button
                     type="button"
                     class="follow-up-btn ${
-                      progress === "consistent"
+                      progress === firstValue
                         ? "selected" +
                           (
                             answer === "bad"
@@ -2697,17 +2669,19 @@ const cameraComments = {
                     }"
                     onclick="setUnderstandingProgress(
                       '${trainee.id}',
-                      'consistent'
+                      '${firstValue}'
                     )"
                   >
-                    Consistent
+                    ${escapeHTML(
+                      firstLabel
+                    )}
                   </button>
 
 
                   <button
                     type="button"
                     class="follow-up-btn ${
-                      progress === "trend"
+                      progress === secondValue
                         ? "selected" +
                           (
                             answer === "bad"
@@ -2718,7 +2692,7 @@ const cameraComments = {
                     }"
                     onclick="setUnderstandingProgress(
                       '${trainee.id}',
-                      'trend'
+                      '${secondValue}'
                     )"
                   >
                     ${escapeHTML(
@@ -2813,30 +2787,30 @@ const cameraComments = {
      ========================================================= */
 
   function setCamera(
-  id,
-  value
-) {
+    id,
+    value
+  ) {
 
-  const trainee =
-    findTrainee(id);
+    const trainee =
+      findTrainee(id);
 
-  if (!trainee) {
-    return;
+    if (!trainee) {
+      return;
+    }
+
+    trainee.camera =
+      value;
+
+    delete trainee.randomComments.camera;
+
+    saveData();
+
+    renderCardBody(id);
+
+    updatePreview(id);
+
   }
 
-  trainee.camera =
-    value;
-
-  // Clear the previous random camera comment
-  delete trainee.randomComments.camera;
-
-  saveData();
-
-  renderCardBody(id);
-
-  updatePreview(id);
-
-}
 
   /* =========================================================
      SET FEEDBACK ANSWER
@@ -2876,8 +2850,6 @@ const cameraComments = {
         questionKey
       ];
 
-
-    /* Clicking the same answer removes it */
 
     if (
       previousAnswer === answer
@@ -2924,12 +2896,6 @@ const cameraComments = {
           ]
         );
 
-
-      /*
-        If Understanding changes from Good
-        to Needs Improvement or vice versa,
-        the follow-up must be selected again.
-      */
 
       if (
         questionKey === "understanding"
@@ -2992,11 +2958,6 @@ const cameraComments = {
     const previous =
       trainee.understandingProgress;
 
-
-    /*
-      Clicking the same follow-up again
-      removes the selection.
-    */
 
     if (
       previous === value
@@ -3476,33 +3437,55 @@ const cameraComments = {
     }
 
 
-/* CAMERA */
+    /* CAMERA */
 
-if (trainee.camera) {
+    if (trainee.camera) {
 
-  const cameraType =
-    trainee.camera === "always"
-      ? "good"
-      : "bad";
+      const cameraType =
+        trainee.camera === "always"
+          ? "good"
+          : "bad";
 
-  let cameraComment =
-    trainee.randomComments.camera;
 
-  if (!cameraComment) {
+      if (!trainee.randomComments) {
 
-    cameraComment =
-getRandomFromPool(
-  `camera_${cameraType}`,
-  cameraComments[cameraType],
-  null
-)
+        trainee.randomComments = {};
 
-    trainee.randomComments.camera =
-      cameraComment;
-  }
+      }
 
-  parts.push(cameraComment);
-}
+
+      let cameraComment =
+        trainee.randomComments.camera;
+
+
+      if (!cameraComment) {
+
+        cameraComment =
+          getRandomFromPool(
+            `camera_${cameraType}`,
+            cameraComments[cameraType],
+            null
+          );
+
+
+        trainee.randomComments.camera =
+          cameraComment;
+
+      }
+
+
+      if (
+        cameraComment &&
+        cameraComment.trim()
+      ) {
+
+        parts.push(
+          cameraComment.trim()
+        );
+
+      }
+
+    }
 
 
     /* FEEDBACK QUESTIONS */
@@ -4409,10 +4392,6 @@ getRandomFromPool(
         );
 
 
-      /*
-        Previous versions.
-      */
-
       if (!saved) {
 
         saved =
@@ -4484,9 +4463,7 @@ getRandomFromPool(
             const answers = {};
 
 
-            /*
-              Load only valid question answers.
-            */
+            /* Load only valid question answers */
 
             if (
               trainee.answers &&
@@ -4520,25 +4497,25 @@ getRandomFromPool(
             }
 
 
-            /*
-              Load random comments only for
-              currently selected answers.
-            */
+            /* Load random comments */
 
             const randomComments = {};
 
-/* Load random camera comment */
 
-if (
-  trainee.camera &&
-  trainee.randomComments &&
-  trainee.randomComments.camera
-) {
+            /* Load random camera comment */
 
-  randomComments.camera =
-    trainee.randomComments.camera;
+            if (
+              trainee.camera &&
+              trainee.randomComments &&
+              trainee.randomComments.camera
+            ) {
 
-}
+              randomComments.camera =
+                trainee.randomComments.camera;
+
+            }
+
+
             feedbackQuestions.forEach(
               function(question) {
 
@@ -4567,6 +4544,12 @@ if (
 
             /*
               Load understanding follow-up.
+
+              New values:
+              good_performance
+              improved
+              bad_performance
+              declined
             */
 
             let understandingProgress =
@@ -4576,10 +4559,20 @@ if (
 
             if (
               understandingProgress !==
-              "consistent" &&
+              "good_performance" &&
               understandingProgress !==
-              "trend"
+              "improved" &&
+              understandingProgress !==
+              "bad_performance" &&
+              understandingProgress !==
+              "declined"
             ) {
+
+              /*
+                Old saved values are intentionally
+                cleared because the new UI uses
+                the new explicit values.
+              */
 
               understandingProgress =
                 "";
@@ -4601,6 +4594,48 @@ if (
 
             }
 
+
+            /*
+              Make sure the selected follow-up
+              belongs to the correct answer.
+            */
+
+            if (
+              answers.understanding === "good" &&
+              (
+                understandingProgress ===
+                "bad_performance" ||
+                understandingProgress ===
+                "declined"
+              )
+            ) {
+
+              understandingProgress =
+                "";
+
+            }
+
+
+            if (
+              answers.understanding === "bad" &&
+              (
+                understandingProgress ===
+                "good_performance" ||
+                understandingProgress ===
+                "improved"
+              )
+            ) {
+
+              understandingProgress =
+                "";
+
+            }
+
+
+            /*
+              Restore the random performance
+              comment for the selected follow-up.
+            */
 
             if (
               understandingProgress &&
@@ -4828,3 +4863,4 @@ if (
 
 </body>
 </html>
+```
