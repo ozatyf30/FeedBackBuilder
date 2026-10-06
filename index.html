@@ -789,7 +789,7 @@
 
 <script>
 
-  /* =========================================================
+ /* =========================================================
      FEEDBACK DATABASE
 
      IMPORTANT:
@@ -1638,6 +1638,45 @@ const cameraComments = {
     return comments[
       randomIndex
     ];
+
+  }
+
+
+  /* =========================================================
+     SHUFFLE ARRAY
+     ========================================================= */
+
+  function shuffleArray(array) {
+
+    const shuffled =
+      [...array];
+
+
+    for (
+      let i = shuffled.length - 1;
+      i > 0;
+      i--
+    ) {
+
+      const j =
+        Math.floor(
+          Math.random() *
+          (i + 1)
+        );
+
+
+      [
+        shuffled[i],
+        shuffled[j]
+      ] = [
+        shuffled[j],
+        shuffled[i]
+      ];
+
+    }
+
+
+    return shuffled;
 
   }
 
@@ -2596,8 +2635,6 @@ const cameraComments = {
           }
 
 
-          /* UNDERSTANDING FOLLOW-UP */
-
           let followUpHTML = "";
 
 
@@ -3349,6 +3386,27 @@ const cameraComments = {
 
   /* =========================================================
      GENERATE FEEDBACK
+
+     IMPORTANT:
+     He/She is added ONLY ONCE.
+
+     All feedback phrases after He/She are collected
+     and shuffled so the feedback does not always start
+     with the same fixed sentence.
+
+     Example:
+
+     He communicated clearly during role plays,
+     passed the final quiz successfully,
+     showed positive interaction throughout the session,
+     kept the camera on during training,
+     applied the trainer's feedback during activities.
+
+     Instead of always:
+
+     He passed the final quiz successfully,
+     completed all daily quizzes successfully,
+     ...
      ========================================================= */
 
   function generateFeedback(
@@ -3378,13 +3436,19 @@ const cameraComments = {
     }
 
 
-    const parts = [];
-
-
     const pronoun =
       trainee.gender === "She"
         ? "She"
         : "He";
+
+
+    /*
+      Everything after He/She goes into this array.
+      The array will be shuffled before the final sentence
+      is created.
+    */
+
+    const feedbackParts = [];
 
 
     /* FINAL QUIZ */
@@ -3393,16 +3457,14 @@ const cameraComments = {
       trainee.finalQuiz === "Passed"
     ) {
 
-      parts.push(
-        pronoun +
-        " passed the final quiz successfully"
+      feedbackParts.push(
+        "passed the final quiz successfully"
       );
 
     } else {
 
-      parts.push(
-        pronoun +
-        " did not pass the final quiz"
+      feedbackParts.push(
+        "did not pass the final quiz"
       );
 
     }
@@ -3415,13 +3477,13 @@ const cameraComments = {
       "Completed all daily quizzes successfully"
     ) {
 
-      parts.push(
+      feedbackParts.push(
         "completed all daily quizzes successfully"
       );
 
     } else {
 
-      parts.push(
+      feedbackParts.push(
         "missed daily quizzes, coaching was provided"
       );
 
@@ -3470,7 +3532,7 @@ const cameraComments = {
         cameraComment.trim()
       ) {
 
-        parts.push(
+        feedbackParts.push(
           cameraComment.trim()
         );
 
@@ -3552,7 +3614,7 @@ const cameraComments = {
             comment.trim()
           ) {
 
-            parts.push(
+            feedbackParts.push(
               comment.trim()
             );
 
@@ -3582,7 +3644,7 @@ const cameraComments = {
               progressComment.trim()
             ) {
 
-              parts.push(
+              feedbackParts.push(
                 progressComment.trim()
               );
 
@@ -3606,34 +3668,53 @@ const cameraComments = {
 
     if (attendance) {
 
-      parts.push(
+      feedbackParts.push(
         attendance
       );
 
     }
 
 
-    /* CUSTOM COMMENT */
+    /*
+      RANDOMIZE ALL AUTOMATIC FEEDBACK PHRASES.
+
+      He/She stays fixed at the beginning.
+      Everything else can appear in a different order.
+    */
+
+    const shuffledParts =
+      shuffleArray(
+        feedbackParts
+      );
+
+
+    /*
+      CUSTOM COMMENT stays at the end because it is
+      user-written text and may contain its own sentence
+      structure.
+    */
 
     if (
       trainee.custom &&
       trainee.custom.trim()
     ) {
 
-      parts.push(
+      shuffledParts.push(
         trainee.custom.trim()
       );
 
     }
 
 
-    if (!parts.length) {
+    if (!shuffledParts.length) {
       return "";
     }
 
 
     let result =
-      parts
+      pronoun +
+      " " +
+      shuffledParts
         .filter(
           function(part) {
 
@@ -4454,8 +4535,6 @@ const cameraComments = {
             const answers = {};
 
 
-            /* Load only valid question answers */
-
             if (
               trainee.answers &&
               typeof trainee.answers ===
@@ -4488,12 +4567,8 @@ const cameraComments = {
             }
 
 
-            /* Load random comments */
-
             const randomComments = {};
 
-
-            /* Load random camera comment */
 
             if (
               trainee.camera &&
@@ -4533,16 +4608,6 @@ const cameraComments = {
             );
 
 
-            /*
-              Load understanding follow-up.
-
-              New values:
-              good_performance
-              improved
-              bad_performance
-              declined
-            */
-
             let understandingProgress =
               trainee.understandingProgress ||
               "";
@@ -4559,22 +4624,11 @@ const cameraComments = {
               "declined"
             ) {
 
-              /*
-                Old saved values are intentionally
-                cleared because the new UI uses
-                the new explicit values.
-              */
-
               understandingProgress =
                 "";
 
             }
 
-
-            /*
-              Follow-up is only valid when
-              Understanding has been selected.
-            */
 
             if (
               !answers.understanding
@@ -4585,11 +4639,6 @@ const cameraComments = {
 
             }
 
-
-            /*
-              Make sure the selected follow-up
-              belongs to the correct answer.
-            */
 
             if (
               answers.understanding === "good" &&
@@ -4622,11 +4671,6 @@ const cameraComments = {
 
             }
 
-
-            /*
-              Restore the random performance
-              comment for the selected follow-up.
-            */
 
             if (
               understandingProgress &&
