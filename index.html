@@ -349,6 +349,7 @@
       color: #a0aaa5;
       border-color: #e0e5e2;
       cursor: not-allowed;
+      opacity: 0.8;
     }
 
     .attendance-word {
@@ -521,10 +522,20 @@
       border-color: #d3ddd8;
     }
 
+    .follow-up-btn:hover {
+      background: #f4f7f5;
+    }
+
     .follow-up-btn.selected {
       background: #e6eee9;
       border-color: #abc5b3;
       color: #365642;
+    }
+
+    .follow-up-btn.selected.bad-trend {
+      background: #f2e5e5;
+      border-color: #d8b4b4;
+      color: #8a5555;
     }
 
     /* =========================================================
@@ -614,6 +625,7 @@
        ========================================================= */
 
     @media (max-width: 800px) {
+
       .grid {
         grid-template-columns: 1fr;
       }
@@ -622,10 +634,7 @@
         grid-column: span 1;
       }
 
-      /*
-        Keep Tardy and Absent side by side
-        on mobile.
-      */
+      /* Keep Tardy and Absent side by side */
       .attendance-grid {
         grid-template-columns: 1fr 1fr;
         gap: 7px;
@@ -651,6 +660,7 @@
     }
 
     @media (max-width: 520px) {
+
       body {
         padding: 15px 10px 40px;
       }
@@ -670,6 +680,11 @@
 
       .attendance-grid {
         grid-template-columns: 1fr 1fr;
+        gap: 7px;
+      }
+
+      .attendance-item {
+        padding: 8px 7px;
       }
 
       .attendance-top {
@@ -681,12 +696,19 @@
       }
 
       .attendance-controls {
-        grid-template-columns: 1fr;
+        grid-template-columns: 58px 1fr;
+        gap: 5px;
+      }
+
+      .attendance-word {
+        font-size: 9px;
+        line-height: 1.2;
       }
 
       .number-input {
         height: 34px;
         font-size: 12px;
+        padding: 0 7px;
       }
 
       .remove-trainee-btn {
@@ -810,6 +832,11 @@
 
   /* =========================================================
      FEEDBACK DATABASE
+
+     IMPORTANT:
+     Every question has its own independent GOOD and BAD pool.
+     You can add as many comments as you want to any question
+     without changing the JavaScript functions.
      ========================================================= */
 
   const feedbackQuestions = [
@@ -834,7 +861,44 @@
         "needed repeated explanations for some topics",
         "had difficulty understanding some parts of the training content",
         "showed weak understanding of some topics discussed during training"
-      ]
+      ],
+
+      performance: {
+
+        good: {
+          consistent: [
+            "maintained consistent performance throughout the training",
+            "maintained a good level of performance throughout the training",
+            "performed consistently well throughout the training",
+            "showed consistent performance during the training sessions"
+          ],
+
+          improved: [
+            "started weak but showed clear improvement throughout the training",
+            "started with weaker performance but improved throughout the training",
+            "showed clear improvement after a weaker start",
+            "improved steadily as the training progressed"
+          ]
+        },
+
+        bad: {
+          consistent: [
+            "consistently needed improvement throughout the training",
+            "maintained a weak performance level throughout the training",
+            "continued to need support throughout the training",
+            "showed consistently weak performance during the training"
+          ],
+
+          declined: [
+            "started with good performance but showed a decline later in the training",
+            "started well but showed weaker performance as the training progressed",
+            "showed good performance at first but declined later in the training",
+            "started strongly but performance became weaker later in the training"
+          ]
+        }
+
+      }
+
     },
 
 
@@ -949,10 +1013,10 @@
      ========================================================= */
 
   const STORAGE_KEY =
-    "trainee_feedback_builder_v8";
+    "trainee_feedback_builder_v9";
 
   const RANDOM_HISTORY_KEY =
-    "trainee_feedback_random_history_v2";
+    "trainee_feedback_random_history_v3";
 
   let trainees = [];
 
@@ -1074,28 +1138,14 @@
 
 
   /* =========================================================
-     GET RANDOM COMMENT
+     RANDOM FROM ARRAY
      ========================================================= */
 
-  function getRandomComment(
-    questionKey,
-    type,
+  function getRandomFromPool(
+    historyKey,
+    comments,
     previousComment
   ) {
-
-    const question =
-      findQuestion(
-        questionKey
-      );
-
-    if (!question) {
-      return "";
-    }
-
-    const comments =
-      type === "good"
-        ? question.good
-        : question.bad;
 
     if (
       !Array.isArray(comments) ||
@@ -1106,10 +1156,6 @@
 
     }
 
-    const historyKey =
-      questionKey +
-      "_" +
-      type;
 
     if (
       !randomHistory[historyKey] ||
@@ -1122,8 +1168,10 @@
 
     }
 
+
     let history =
       randomHistory[historyKey];
+
 
     history =
       history.filter(
@@ -1138,6 +1186,7 @@
         }
       );
 
+
     if (
       history.length >= comments.length
     ) {
@@ -1145,6 +1194,7 @@
       history = [];
 
     }
+
 
     let available =
       comments
@@ -1163,12 +1213,13 @@
           }
         );
 
+
     if (
       previousComment &&
       available.length > 1
     ) {
 
-      available =
+      const filtered =
         available.filter(
           function(index) {
 
@@ -1180,7 +1231,15 @@
           }
         );
 
+      if (filtered.length) {
+
+        available =
+          filtered;
+
+      }
+
     }
+
 
     if (!available.length) {
 
@@ -1193,6 +1252,7 @@
 
     }
 
+
     const randomIndex =
       available[
         Math.floor(
@@ -1201,18 +1261,122 @@
         )
       ];
 
+
     history.push(
       randomIndex
     );
 
+
     randomHistory[historyKey] =
       history;
 
+
     saveRandomHistory();
+
 
     return comments[
       randomIndex
     ];
+
+  }
+
+
+  /* =========================================================
+     GET RANDOM COMMENT
+
+     Each question has its own good/bad pool.
+     ========================================================= */
+
+  function getRandomComment(
+    questionKey,
+    type,
+    previousComment
+  ) {
+
+    const question =
+      findQuestion(
+        questionKey
+      );
+
+
+    if (!question) {
+      return "";
+    }
+
+
+    const comments =
+      type === "good"
+        ? question.good
+        : question.bad;
+
+
+    return getRandomFromPool(
+      questionKey + "_" + type,
+      comments,
+      previousComment
+    );
+
+  }
+
+
+  /* =========================================================
+     GET RANDOM PERFORMANCE COMMENT
+
+     Understanding follow-up has its own independent pools.
+     ========================================================= */
+
+  function getRandomPerformanceComment(
+    understandingAnswer,
+    progress,
+    previousComment
+  ) {
+
+    const question =
+      findQuestion(
+        "understanding"
+      );
+
+
+    if (
+      !question ||
+      !question.performance
+    ) {
+
+      return "";
+
+    }
+
+
+    const side =
+      understandingAnswer === "good"
+        ? question.performance.good
+        : question.performance.bad;
+
+
+    if (
+      !side ||
+      !Array.isArray(
+        side[progress]
+      )
+    ) {
+
+      return "";
+
+    }
+
+
+    const historyKey =
+      "understanding_performance_" +
+      understandingAnswer +
+      "_" +
+      progress;
+
+
+    return getRandomFromPool(
+      historyKey,
+      side[progress],
+      previousComment
+    );
 
   }
 
@@ -1286,6 +1450,7 @@
         "traineeNames"
       );
 
+
     const names =
       textarea.value
         .split("\n")
@@ -1300,6 +1465,7 @@
           }
         );
 
+
     if (!names.length) {
 
       showToast(
@@ -1309,6 +1475,7 @@
       return;
 
     }
+
 
     names.forEach(
       function(name) {
@@ -1320,11 +1487,13 @@
       }
     );
 
+
     textarea.value = "";
 
     saveData();
 
     render();
+
 
     showToast(
       names.length +
@@ -1345,10 +1514,12 @@
         "traineeList"
       );
 
+
     const count =
       document.getElementById(
         "traineeCount"
       );
+
 
     const search =
       document
@@ -1358,6 +1529,7 @@
         .value
         .toLowerCase()
         .trim();
+
 
     const filtered =
       trainees.filter(
@@ -1374,6 +1546,7 @@
         }
       );
 
+
     count.textContent =
       trainees.length +
       (
@@ -1381,6 +1554,7 @@
           ? " trainee"
           : " trainees"
       );
+
 
     if (!filtered.length) {
 
@@ -1401,6 +1575,7 @@
       return;
 
     }
+
 
     list.innerHTML =
       filtered
@@ -1778,6 +1953,7 @@
                     class="number-input"
                     type="number"
                     min="1"
+                    max="999"
                     value="${normalizeCount(
                       trainee.tardyCount
                     )}"
@@ -1863,6 +2039,7 @@
                     class="number-input"
                     type="number"
                     min="1"
+                    max="999"
                     value="${normalizeCount(
                       trainee.absentCount
                     )}"
@@ -2045,7 +2222,9 @@
                 ]
               : "";
 
+
           let stateText = "";
+
 
           if (answer === "good") {
 
@@ -2060,11 +2239,10 @@
           }
 
 
-          /*
-            Understanding follow-up
-          */
+          /* UNDERSTANDING FOLLOW-UP */
 
           let followUpHTML = "";
+
 
           if (
             question.key === "understanding" &&
@@ -2075,15 +2253,12 @@
               trainee.understandingProgress ||
               "";
 
-            const firstLabel =
-              answer === "good"
-                ? "Consistent"
-                : "Consistent";
 
             const secondLabel =
               answer === "good"
                 ? "Started weak and improved"
                 : "Started good and declined";
+
 
             followUpHTML = `
 
@@ -2093,13 +2268,19 @@
                   How was the trainee's performance throughout the training?
                 </div>
 
+
                 <div class="follow-up-buttons">
 
                   <button
                     type="button"
                     class="follow-up-btn ${
                       progress === "consistent"
-                        ? "selected"
+                        ? "selected" +
+                          (
+                            answer === "bad"
+                              ? " bad-trend"
+                              : ""
+                          )
                         : ""
                     }"
                     onclick="setUnderstandingProgress(
@@ -2107,7 +2288,7 @@
                       'consistent'
                     )"
                   >
-                    ${firstLabel}
+                    Consistent
                   </button>
 
 
@@ -2115,7 +2296,12 @@
                     type="button"
                     class="follow-up-btn ${
                       progress === "trend"
-                        ? "selected"
+                        ? "selected" +
+                          (
+                            answer === "bad"
+                              ? " bad-trend"
+                              : ""
+                          )
                         : ""
                     }"
                     onclick="setUnderstandingProgress(
@@ -2123,7 +2309,9 @@
                       'trend'
                     )"
                   >
-                    ${secondLabel}
+                    ${escapeHTML(
+                      secondLabel
+                    )}
                   </button>
 
                 </div>
@@ -2220,12 +2408,15 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
 
+
     trainee.camera =
       value;
+
 
     saveData();
 
@@ -2249,9 +2440,11 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
+
 
     if (!trainee.answers) {
 
@@ -2259,11 +2452,13 @@
 
     }
 
+
     if (!trainee.randomComments) {
 
       trainee.randomComments = {};
 
     }
+
 
     const previousAnswer =
       trainee.answers[
@@ -2271,9 +2466,7 @@
       ];
 
 
-    /*
-      Clicking the same answer removes it.
-    */
+    /* Clicking the same answer removes it */
 
     if (
       previousAnswer === answer
@@ -2283,14 +2476,11 @@
         questionKey
       ];
 
+
       delete trainee.randomComments[
         questionKey
       ];
 
-
-      /*
-        Also remove understanding follow-up.
-      */
 
       if (
         questionKey === "understanding"
@@ -2298,6 +2488,10 @@
 
         trainee.understandingProgress =
           "";
+
+        delete trainee.randomComments[
+          "understandingProgress"
+        ];
 
       }
 
@@ -2321,10 +2515,9 @@
 
 
       /*
-        When changing between Good and
-        Needs Improvement, reset the
-        follow-up so the trainer must
-        choose the new appropriate state.
+        If Understanding changes from Good
+        to Needs Improvement or vice versa,
+        the follow-up must be selected again.
       */
 
       if (
@@ -2333,6 +2526,10 @@
 
         trainee.understandingProgress =
           "";
+
+        delete trainee.randomComments[
+          "understandingProgress"
+        ];
 
       }
 
@@ -2360,22 +2557,79 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
 
+
+    const understanding =
+      trainee.answers &&
+      trainee.answers.understanding;
+
+
     if (
-      !trainee.answers ||
-      trainee.answers.understanding !== "good" &&
-      trainee.answers.understanding !== "bad"
+      understanding !== "good" &&
+      understanding !== "bad"
     ) {
 
       return;
 
     }
 
-    trainee.understandingProgress =
-      value;
+
+    const previous =
+      trainee.understandingProgress;
+
+
+    /*
+      Clicking the same follow-up again
+      removes the selection.
+    */
+
+    if (
+      previous === value
+    ) {
+
+      trainee.understandingProgress =
+        "";
+
+      if (
+        trainee.randomComments
+      ) {
+
+        delete trainee.randomComments[
+          "understandingProgress"
+        ];
+
+      }
+
+    } else {
+
+      trainee.understandingProgress =
+        value;
+
+
+      if (!trainee.randomComments) {
+
+        trainee.randomComments = {};
+
+      }
+
+
+      trainee.randomComments[
+        "understandingProgress"
+      ] =
+        getRandomPerformanceComment(
+          understanding,
+          value,
+          trainee.randomComments[
+            "understandingProgress"
+          ]
+        );
+
+    }
+
 
     saveData();
 
@@ -2397,23 +2651,28 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
+
 
     const card =
       document.getElementById(
         "card-" + id
       );
 
+
     if (!card) {
       return;
     }
+
 
     const questionList =
       card.querySelector(
         ".question-list"
       );
+
 
     if (questionList) {
 
@@ -2436,12 +2695,15 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
 
+
     trainee.open =
       !trainee.open;
+
 
     saveData();
 
@@ -2462,14 +2724,18 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
 
+
     trainee.name =
       value;
 
+
     saveData();
+
 
     const title =
       document.querySelector(
@@ -2477,6 +2743,7 @@
         id +
         " .trainee-name-title"
       );
+
 
     if (title) {
 
@@ -2502,12 +2769,15 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
 
+
     trainee[field] =
       value;
+
 
     saveData();
 
@@ -2528,12 +2798,15 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
 
+
     trainee.custom =
       value;
+
 
     saveData();
 
@@ -2555,12 +2828,15 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
 
+
     trainee[field] =
       checked;
+
 
     saveData();
 
@@ -2582,14 +2858,17 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
+
 
     trainee[field] =
       normalizeCount(
         value
       );
+
 
     saveData();
 
@@ -2611,19 +2890,23 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
+
 
     const tardyWord =
       document.getElementById(
         "tardy-word-" + id
       );
 
+
     const absentWord =
       document.getElementById(
         "absent-word-" + id
       );
+
 
     if (tardyWord) {
 
@@ -2637,6 +2920,7 @@
           : "";
 
     }
+
 
     if (absentWord) {
 
@@ -2665,24 +2949,30 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
 
+
     const wasOpen =
       trainee.open;
 
+
     render();
+
 
     const updatedCard =
       document.getElementById(
         "card-" + id
       );
 
+
     if (updatedCard) {
 
       trainee.open =
         wasOpen;
+
 
       updatedCard.classList.toggle(
         "open",
@@ -2778,6 +3068,14 @@
     /* CAMERA */
 
     if (
+      trainee.camera === "always"
+    ) {
+
+      parts.push(
+        "kept the camera on throughout the sessions"
+      );
+
+    } else if (
       trainee.camera === "sometimes_off"
     ) {
 
@@ -2802,6 +3100,7 @@
             trainee.answers[
               question.key
             ];
+
 
           if (
             answer !== "good" &&
@@ -2839,11 +3138,13 @@
                 answer
               );
 
+
             if (!trainee.randomComments) {
 
               trainee.randomComments = {};
 
             }
+
 
             trainee.randomComments[
               question.key
@@ -2865,36 +3166,31 @@
           }
 
 
-          /*
-            Understanding trend
-          */
+          /* UNDERSTANDING PERFORMANCE */
 
           if (
             question.key === "understanding" &&
             trainee.understandingProgress
           ) {
 
-            if (
-              answer === "good" &&
-              trainee.understandingProgress ===
-              "trend"
-            ) {
-
-              parts.push(
-                "started with weaker understanding but improved throughout the training"
-              );
-
-            }
+            const progressComment =
+              trainee.randomComments &&
+              trainee.randomComments[
+                "understandingProgress"
+              ]
+                ? trainee.randomComments[
+                    "understandingProgress"
+                  ]
+                : "";
 
 
             if (
-              answer === "bad" &&
-              trainee.understandingProgress ===
-              "trend"
+              progressComment &&
+              progressComment.trim()
             ) {
 
               parts.push(
-                "started with good understanding but showed a decline later in the training"
+                progressComment.trim()
               );
 
             }
@@ -2913,6 +3209,7 @@
       buildAttendanceComment(
         trainee
       );
+
 
     if (attendance) {
 
@@ -3065,6 +3362,7 @@
         10
       );
 
+
     if (
       isNaN(number) ||
       number < 1
@@ -3074,11 +3372,13 @@
 
     }
 
+
     if (number > 999) {
 
       number = 999;
 
     }
+
 
     return number;
 
@@ -3097,6 +3397,7 @@
       normalizeCount(
         number
       );
+
 
     const ones = [
 
@@ -3218,8 +3519,10 @@
           number / 100
         );
 
+
       const remainder =
         number % 100;
+
 
       if (
         remainder === 0
@@ -3231,6 +3534,7 @@
         );
 
       }
+
 
       return (
         ones[hundred] +
@@ -3259,14 +3563,17 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
+
 
     const preview =
       document.getElementById(
         "preview-" + id
       );
+
 
     if (preview) {
 
@@ -3276,6 +3583,7 @@
         );
 
     }
+
 
     saveData();
 
@@ -3312,14 +3620,17 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
+
 
     const text =
       generateFeedback(
         trainee
       );
+
 
     if (!text.trim()) {
 
@@ -3330,6 +3641,7 @@
       return;
 
     }
+
 
     copyText(
       text
@@ -3365,9 +3677,11 @@
                 trainee
               );
 
+
             if (!feedback.trim()) {
               return "";
             }
+
 
             return (
               trainee.name.trim() +
@@ -3467,26 +3781,33 @@
         "textarea"
       );
 
+
     textarea.value =
       text;
+
 
     textarea.style.position =
       "fixed";
 
+
     textarea.style.left =
       "-9999px";
+
 
     document.body.appendChild(
       textarea
     );
 
+
     textarea.select();
+
 
     try {
 
       document.execCommand(
         "copy"
       );
+
 
       showToast(
         "Copied successfully."
@@ -3499,6 +3820,7 @@
       );
 
     }
+
 
     document.body.removeChild(
       textarea
@@ -3518,32 +3840,40 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
 
+
     const keepName =
       trainee.name;
 
+
     const keepOpen =
       trainee.open;
+
 
     const index =
       trainees.indexOf(
         trainee
       );
 
+
     trainees[index] =
       createTrainee(
         keepName
       );
 
+
     trainees[index].open =
       keepOpen;
+
 
     saveData();
 
     render();
+
 
     showToast(
       "Trainee feedback cleared."
@@ -3569,9 +3899,11 @@
         }
       );
 
+
     saveData();
 
     render();
+
 
     showToast(
       "Trainee removed."
@@ -3590,20 +3922,25 @@
       return;
     }
 
+
     const confirmed =
       confirm(
         "Are you sure you want to remove all trainees?"
       );
 
+
     if (!confirmed) {
       return;
     }
 
+
     trainees = [];
+
 
     saveData();
 
     render();
+
 
     showToast(
       "All trainees removed."
@@ -3654,9 +3991,18 @@
 
 
       /*
-        Try previous versions if V8
-        doesn't exist.
+        Previous versions.
       */
+
+      if (!saved) {
+
+        saved =
+          localStorage.getItem(
+            "trainee_feedback_builder_v8"
+          );
+
+      }
+
 
       if (!saved) {
 
@@ -3667,6 +4013,7 @@
 
       }
 
+
       if (!saved) {
 
         saved =
@@ -3675,6 +4022,7 @@
           );
 
       }
+
 
       if (!saved) {
 
@@ -3717,6 +4065,10 @@
             const answers = {};
 
 
+            /*
+              Load only valid question answers.
+            */
+
             if (
               trainee.answers &&
               typeof trainee.answers ===
@@ -3730,6 +4082,7 @@
                     trainee.answers[
                       question.key
                     ];
+
 
                   if (
                     answer === "good" ||
@@ -3747,6 +4100,11 @@
 
             }
 
+
+            /*
+              Load random comments only for
+              currently selected answers.
+            */
 
             const randomComments = {};
 
@@ -3777,14 +4135,14 @@
             );
 
 
+            /*
+              Load understanding follow-up.
+            */
+
             let understandingProgress =
               trainee.understandingProgress ||
               "";
 
-
-            /*
-              Only allow a valid follow-up.
-            */
 
             if (
               understandingProgress !==
@@ -3793,7 +4151,41 @@
               "trend"
             ) {
 
-              understandingProgress = "";
+              understandingProgress =
+                "";
+
+            }
+
+
+            /*
+              Follow-up is only valid when
+              Understanding has been selected.
+            */
+
+            if (
+              !answers.understanding
+            ) {
+
+              understandingProgress =
+                "";
+
+            }
+
+
+            if (
+              understandingProgress &&
+              trainee.randomComments &&
+              trainee.randomComments[
+                "understandingProgress"
+              ]
+            ) {
+
+              randomComments[
+                "understandingProgress"
+              ] =
+                trainee.randomComments[
+                  "understandingProgress"
+                ];
 
             }
 
@@ -3860,11 +4252,7 @@
                 randomComments,
 
               understandingProgress:
-                (
-                  answers.understanding
-                    ? understandingProgress
-                    : ""
-                ),
+                understandingProgress,
 
               custom:
                 trainee.custom ||
@@ -3887,6 +4275,7 @@
         "Could not load saved data:",
         error
       );
+
 
       trainees = [];
 
@@ -3965,16 +4354,20 @@
         "toast"
       );
 
+
     toast.textContent =
       message;
+
 
     toast.classList.add(
       "show"
     );
 
+
     clearTimeout(
       toastTimer
     );
+
 
     toastTimer =
       setTimeout(
