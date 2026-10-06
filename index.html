@@ -237,6 +237,10 @@
       display: block;
     }
 
+    /* =========================================================
+       BASIC FIELDS
+       ========================================================= */
+
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -276,6 +280,10 @@
     .name-field {
       grid-column: span 3;
     }
+
+    /* =========================================================
+       ATTENDANCE
+       ========================================================= */
 
     .attendance-section {
       border: 1px solid #e0e6e3;
@@ -331,110 +339,96 @@
       min-height: 16px;
     }
 
+    /* =========================================================
+       FEEDBACK QUESTIONS
+       ========================================================= */
+
     .feedback-section {
       border-top: 1px solid #e4e9e6;
       padding-top: 18px;
     }
 
-    .feedback-search {
-      margin-bottom: 12px;
+    .feedback-intro {
+      margin: -4px 0 14px;
+      color: #74807b;
+      font-size: 12px;
+      line-height: 1.5;
     }
 
-    .feedback-search input {
-      width: 100%;
-      height: 38px;
-      border: 1px solid #ccd6d2;
-      border-radius: 8px;
-      padding: 0 10px;
-      outline: none;
-      font: inherit;
-      background: #ffffff;
-    }
-
-    .category {
-      border: 1px solid #dfe6e2;
-      border-radius: 9px;
-      margin-bottom: 8px;
-      background: #ffffff;
-      overflow: hidden;
-    }
-
-    .category-summary {
-      cursor: pointer;
-      list-style: none;
-      padding: 11px 13px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #40534a;
-      background: #fafcfb;
-      user-select: none;
-    }
-
-    .category-summary::-webkit-details-marker {
-      display: none;
-    }
-
-    .category-summary::before {
-      content: "▶";
-      display: inline-block;
-      width: 18px;
-      font-size: 9px;
-      color: #728078;
-    }
-
-    .category[open] > .category-summary::before {
-      content: "▼";
-    }
-
-    .category-summary:hover {
-      background: #f5f8f6;
-    }
-
-    .category-content {
-      padding: 11px 13px 13px;
-      border-top: 1px solid #e6ebe8;
-    }
-
-    .category-type {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      font-weight: 700;
-      color: #718079;
-      margin: 8px 0;
-    }
-
-    .category-type:first-child {
-      margin-top: 0;
-    }
-
-    .checkbox-list {
+    .question-list {
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 10px;
     }
 
-    .check-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
+    .feedback-question {
+      border: 1px solid #dfe6e2;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 13px;
+    }
+
+    .question-text {
+      color: #354640;
       font-size: 13px;
-      line-height: 1.5;
-      color: #39484d;
-      cursor: pointer;
-      padding: 5px 4px;
-      border-radius: 5px;
+      font-weight: 600;
+      line-height: 1.45;
+      margin-bottom: 10px;
     }
 
-    .check-item:hover {
-      background: #f7f9f8;
+    .answer-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
 
-    .check-item input {
-      margin-top: 3px;
-      flex: 0 0 auto;
-      accent-color: #5f8f73;
+    .answer-btn {
+      min-height: 38px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #ffffff;
     }
+
+    .answer-btn.good {
+      color: #4f795f;
+      border-color: #c8dccf;
+    }
+
+    .answer-btn.good:hover {
+      background: #f3f8f4;
+    }
+
+    .answer-btn.good.selected {
+      background: #5f8f73;
+      border-color: #5f8f73;
+      color: #ffffff;
+    }
+
+    .answer-btn.bad {
+      color: #996161;
+      border-color: #dfcccc;
+    }
+
+    .answer-btn.bad:hover {
+      background: #fff6f6;
+    }
+
+    .answer-btn.bad.selected {
+      background: #a76666;
+      border-color: #a76666;
+      color: #ffffff;
+    }
+
+    .answer-state {
+      margin-top: 7px;
+      min-height: 15px;
+      font-size: 11px;
+      color: #78847f;
+    }
+
+    /* =========================================================
+       CUSTOM
+       ========================================================= */
 
     .custom-section {
       margin-top: 16px;
@@ -451,6 +445,10 @@
     .custom-section textarea {
       min-height: 75px;
     }
+
+    /* =========================================================
+       PREVIEW
+       ========================================================= */
 
     .preview-section {
       margin-top: 16px;
@@ -485,6 +483,10 @@
       font-size: 14px;
     }
 
+    /* =========================================================
+       TOAST
+       ========================================================= */
+
     .toast {
       position: fixed;
       bottom: 24px;
@@ -505,6 +507,10 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
 
     @media (max-width: 800px) {
       .grid {
@@ -555,6 +561,10 @@
       .trainee-name-title {
         font-size: 15px;
       }
+
+      .answer-buttons {
+        grid-template-columns: 1fr 1fr;
+      }
     }
   </style>
 </head>
@@ -563,10 +573,26 @@
 
 <div class="app">
 
+  <!-- =========================================================
+       HEADER
+       ========================================================= -->
+
   <div class="header">
-    <h1>Trainee Feedback Builder</h1>
-    <p>Create individualized training feedback quickly and consistently.</p>
+
+    <h1>
+      Trainee Feedback Builder
+    </h1>
+
+    <p>
+      Create individualized training feedback quickly and consistently.
+    </p>
+
   </div>
+
+
+  <!-- =========================================================
+       ADD TRAINEES
+       ========================================================= -->
 
   <div class="input-section">
 
@@ -581,19 +607,31 @@
 
     <div class="top-actions">
 
-      <button class="primary" onclick="addTrainees()">
+      <button
+        class="primary"
+        onclick="addTrainees()"
+        type="button"
+      >
         Add Trainees
       </button>
 
-      <button onclick="copyAllFeedback()">
+      <button
+        onclick="copyAllFeedback()"
+        type="button"
+      >
         Copy All Feedback
       </button>
 
-      <button class="danger" onclick="clearAll()">
+      <button
+        class="danger"
+        onclick="clearAll()"
+        type="button"
+      >
         Clear All
       </button>
 
     </div>
+
 
     <div class="search-row">
 
@@ -608,19 +646,39 @@
 
   </div>
 
+
+  <!-- =========================================================
+       TOOLBAR
+       ========================================================= -->
+
   <div class="toolbar">
 
-    <div class="trainee-count" id="traineeCount">
+    <div
+      class="trainee-count"
+      id="traineeCount"
+    >
       0 trainees
     </div>
 
   </div>
 
-  <div id="traineeList" class="trainee-list"></div>
+
+  <!-- =========================================================
+       TRAINEE LIST
+       ========================================================= -->
+
+  <div
+    id="traineeList"
+    class="trainee-list"
+  ></div>
 
 </div>
 
-<div id="toast" class="toast"></div>
+
+<div
+  id="toast"
+  class="toast"
+></div>
 
 
 <script>
@@ -628,709 +686,141 @@
   /* =========================================================
      FEEDBACK DATABASE
 
-     Each behavior has:
-     - key       = unique internal ID
-     - label     = what the trainer sees
-     - comments  = random comments used by the system
+     Only important points are shown to the trainer.
+
+     The trainer sees:
+     Good / Needs Improvement
+
+     The system chooses a random sentence from the
+     corresponding comment pool.
      ========================================================= */
 
-  const feedbackLibrary = [
+  const feedbackQuestions = [
 
     {
-      category: "General Performance",
+      key: "understanding",
 
-      positive: [
+      question:
+        "Did the trainee understand the training content?",
 
-        {
-          key: "engaged_sessions",
-          label: "Engaged during sessions",
-          comments: [
-            "was engaged throughout sessions",
-            "was engaged during sessions",
-            "showed good engagement during sessions",
-            "maintained good engagement throughout the training"
-          ]
-        },
-
-        {
-          key: "good_overall_performance",
-          label: "Good overall performance",
-          comments: [
-            "maintained good overall performance",
-            "showed good overall performance throughout the training",
-            "maintained a good performance level throughout the training"
-          ]
-        },
-
-        {
-          key: "consistent_performance",
-          label: "Consistent performance",
-          comments: [
-            "showed consistent performance throughout the training",
-            "maintained consistent performance during the training",
-            "kept a consistent performance level throughout the training"
-          ]
-        },
-
-        {
-          key: "strong_performance",
-          label: "Strong overall performance",
-          comments: [
-            "showed strong overall performance throughout the training",
-            "showed strong performance during the training",
-            "performed strongly throughout the training"
-          ]
-        },
-
-        {
-          key: "active_participation",
-          label: "Active participation",
-          comments: [
-            "showed active participation throughout the training",
-            "stood out through consistent performance and active participation",
-            "showed strong participation during the training"
-          ]
-        },
-
-        {
-          key: "top_trainee",
-          label: "One of the top trainees",
-          comments: [
-            "was recognized as one of the top trainees",
-            "stood out as one of the top trainees",
-            "was one of the top-performing trainees"
-          ]
-        },
-
-        {
-          key: "improved_over_time",
-          label: "Improved over time",
-          comments: [
-            "showed strong improvement throughout the training",
-            "started with a slow learning curve but showed clear improvement throughout the training",
-            "had a weak start but gradually improved and showed better performance later in the training"
-          ]
-        }
-
+      good: [
+        "demonstrated good understanding of the training material",
+        "showed strong understanding of the training content",
+        "showed good understanding of the topics discussed",
+        "demonstrated good understanding of the process",
+        "showed a good level of understanding during the sessions"
       ],
 
       bad: [
-
-        {
-          key: "performance_declined",
-          label: "Performance declined later",
-          comments: [
-            "started with good performance but showed a decline later in the training",
-            "started the training well but showed weaker performance as the training progressed"
-          ]
-        },
-
-        {
-          key: "unstable_performance",
-          label: "Unstable performance",
-          comments: [
-            "has unstable performance throughout the training period and can't keep the same level",
-            "showed an unstable performance level throughout the training"
-          ]
-        },
-
-        {
-          key: "camera_off",
-          label: "Camera frequently off",
-          comments: [
-            "frequently turns off the camera during sessions",
-            "often keeps the camera off during training sessions",
-            "frequently turned off the camera during sessions, which affected overall engagement"
-          ]
-        }
-
+        "had difficulty understanding some training topics",
+        "showed gaps in understanding some topics",
+        "needed repeated explanations for some topics",
+        "had difficulty understanding some parts of the training content",
+        "showed weak understanding of some topics discussed during training"
       ]
     },
 
 
     {
-      category: "Knowledge",
+      key: "english",
 
-      positive: [
+      question:
+        "Did the trainee demonstrate good English skills?",
 
-        {
-          key: "good_understanding",
-          label: "Good understanding",
-          comments: [
-            "demonstrated good understanding of the training material",
-            "showed strong understanding of the process",
-            "demonstrated a high level of understanding across different topics",
-            "showed good comprehension during training discussions"
-          ]
-        },
-
-        {
-          key: "technical_knowledge",
-          label: "Good technical knowledge",
-          comments: [
-            "showed good technical knowledge during sessions",
-            "showed excellent technical knowledge in role plays",
-            "demonstrated strong technical knowledge in role plays",
-            "demonstrated good technical knowledge during training"
-          ]
-        },
-
-        {
-          key: "knowledge_discussions",
-          label: "Good knowledge during discussions",
-          comments: [
-            "demonstrated good knowledge during discussions",
-            "showed good knowledge during training discussions",
-            "demonstrated good understanding when discussing different topics"
-          ]
-        }
-
+      good: [
+        "showed good English comprehension during training",
+        "read English clearly during training sessions",
+        "showed good English speaking skills during discussions",
+        "demonstrated good English pronunciation during sessions",
+        "showed good ability to understand questions in English",
+        "communicated clearly in English during the sessions"
       ],
 
       bad: [
-
-        {
-          key: "technical_quiz_knowledge",
-          label: "Weak technical knowledge in quizzes",
-          comments: [
-            "showed lack of understanding of technical knowledge based on the technical quiz results",
-            "showed weak understanding of technical topics based on the technical quiz results"
-          ]
-        },
-
-        {
-          key: "specific_topics",
-          label: "Weak understanding of specific topics",
-          comments: [
-            "showed lack of understanding in some specific topics tested in the technical quizzes",
-            "showed weak understanding in some specific topics tested during training"
-          ]
-        },
-
-        {
-          key: "asynchronous_knowledge",
-          label: "Weak understanding in asynchronous activities",
-          comments: [
-            "showed lack of understanding in some specific topics tested from asynchronous activities"
-          ]
-        },
-
-        {
-          key: "synchronous_knowledge",
-          label: "Weak understanding in synchronous activities",
-          comments: [
-            "showed lack of understanding in some specific topics tested from synchronous activities"
-          ]
-        }
-
+        "had difficulty understanding questions in English during sessions",
+        "had difficulty reading English clearly during sessions",
+        "showed weak English speaking skills during discussions",
+        "had difficulty expressing ideas clearly in English",
+        "showed weak English pronunciation when reading during sessions",
+        "had difficulty understanding written training material in English"
       ]
     },
 
 
     {
-      category: "English",
+      key: "role_play",
 
-      positive: [
+      question:
+        "Did the trainee apply the training content well during role plays and activities?",
 
-        {
-          key: "good_english",
-          label: "Good English skills",
-          comments: [
-            "showed good English skills through reading, answering questions, and participating in role plays",
-            "showed good English skills during the training",
-            "demonstrated good English skills during sessions"
-          ]
-        },
-
-        {
-          key: "english_comprehension",
-          label: "Good English comprehension",
-          comments: [
-            "showed good English comprehension during the sessions",
-            "demonstrated good English comprehension during training",
-            "showed good ability to understand questions in English"
-          ]
-        },
-
-        {
-          key: "english_speaking",
-          label: "Good English speaking",
-          comments: [
-            "showed good English speaking skills during discussions",
-            "showed good English speaking skills during sessions",
-            "communicated well in English during discussions"
-          ]
-        },
-
-        {
-          key: "english_reading",
-          label: "Good English reading",
-          comments: [
-            "showed good English reading skills during sessions",
-            "read English clearly during training sessions",
-            "showed good reading skills when reading during sessions"
-          ]
-        },
-
-        {
-          key: "english_pronunciation",
-          label: "Good English pronunciation",
-          comments: [
-            "demonstrated good pronunciation and communication skills",
-            "showed good English pronunciation during reading",
-            "showed clear English pronunciation during sessions"
-          ]
-        }
-
+      good: [
+        "showed strong performance during role plays",
+        "demonstrated good performance across different role-play scenarios",
+        "applied the learned knowledge effectively during role plays",
+        "showed good ability to apply the training content during activities",
+        "performed well during practical activities",
+        "handled different role-play scenarios well"
       ],
 
       bad: [
-
-        {
-          key: "english_comprehension_weak",
-          label: "Difficulty understanding English",
-          comments: [
-            "had difficulty understanding questions in English during sessions",
-            "had difficulty understanding written training material in English"
-          ]
-        },
-
-        {
-          key: "english_reading_weak",
-          label: "Weak English reading",
-          comments: [
-            "showed weak English reading skills when reading during sessions",
-            "had difficulty reading English clearly during sessions"
-          ]
-        },
-
-        {
-          key: "english_speaking_weak",
-          label: "Weak English speaking",
-          comments: [
-            "showed weak English speaking skills during discussions",
-            "had difficulty expressing ideas clearly in English"
-          ]
-        },
-
-        {
-          key: "english_pronunciation_weak",
-          label: "Weak English pronunciation",
-          comments: [
-            "showed weak English pronunciation when reading during sessions",
-            "had difficulty with English pronunciation during sessions"
-          ]
-        }
-
+        "had difficulty applying what was learned during role plays",
+        "needed support when applying the training content during role plays",
+        "had difficulty handling some role-play scenarios",
+        "showed weak application of the training content during activities",
+        "had difficulty applying the learned process during practical activities"
       ]
     },
 
 
     {
-      category: "Activities / Role Plays",
+      key: "participation_communication",
 
-      positive: [
+      question:
+        "Was the trainee active and communicative during sessions?",
 
-        {
-          key: "role_play_performance",
-          label: "Good role play performance",
-          comments: [
-            "showed strong performance in role plays",
-            "demonstrated strong performance during role plays",
-            "showed strong performance in role plays with multiple practice scenarios",
-            "demonstrated strong performance across different role play scenarios"
-          ]
-        },
-
-        {
-          key: "practical_activities",
-          label: "Good practical activities performance",
-          comments: [
-            "showed good performance during practical activities",
-            "performed well during practical activities",
-            "showed good performance during activities"
-          ]
-        },
-
-        {
-          key: "activity_concentration",
-          label: "Good concentration in activities",
-          comments: [
-            "showed good concentration in activities",
-            "maintained good concentration during activities",
-            "showed good focus during activities"
-          ]
-        },
-
-        {
-          key: "apply_training_content",
-          label: "Applies learned knowledge",
-          comments: [
-            "applied the learned knowledge effectively during activities",
-            "showed good ability to apply the training content",
-            "applied the training content well during activities"
-          ]
-        },
-
-        {
-          key: "presentation_skills",
-          label: "Good presentation skills",
-          comments: [
-            "showed good presentation skills during activities",
-            "demonstrated good presentation skills during activities",
-            "presented well during training activities"
-          ]
-        }
-
+      good: [
+        "actively participated in sessions",
+        "responded well to questions during sessions",
+        "communicated clearly during sessions",
+        "participated actively in discussions",
+        "interacted well during discussions and training activities",
+        "showed good participation during sessions",
+        "expressed ideas clearly during discussions"
       ],
 
       bad: [
-
-        {
-          key: "role_play_application_weak",
-          label: "Difficulty applying learning in role plays",
-          comments: [
-            "showed lack of applying what was learned during role plays",
-            "had difficulty applying what was learned during role plays"
-          ]
-        },
-
-        {
-          key: "activity_concentration_weak",
-          label: "Low concentration in activities",
-          comments: [
-            "showed lack of concentration during activities",
-            "had difficulty maintaining concentration during activities"
-          ]
-        },
-
-        {
-          key: "presentation_skills_weak",
-          label: "Weak presentation skills",
-          comments: [
-            "showed lack of presentation skills during activities",
-            "had difficulty presenting during activities"
-          ]
-        }
-
+        "showed limited participation during sessions",
+        "rarely participated in discussions",
+        "needed prompting to participate during sessions",
+        "had difficulty communicating with other trainees",
+        "had difficulty expressing ideas clearly during discussions",
+        "was not responsive enough during sessions"
       ]
     },
 
 
     {
-      category: "Communication",
+      key: "improvement",
 
-      positive: [
+      question:
+        "Did the trainee show improvement and respond well to feedback?",
 
-        {
-          key: "clear_communication",
-          label: "Clear communication",
-          comments: [
-            "communicated clearly and effectively during sessions",
-            "showed good communication skills throughout the training",
-            "showed good verbal communication during the training",
-            "demonstrated clear and effective communication during training",
-            "maintained clear communication throughout the training sessions"
-          ]
-        },
-
-        {
-          key: "answers_questions",
-          label: "Answers questions well",
-          comments: [
-            "communicated well when answering questions during sessions",
-            "responded clearly and appropriately during sessions",
-            "showed good ability to express ideas and respond to questions",
-            "answered questions clearly during sessions"
-          ]
-        },
-
-        {
-          key: "expresses_ideas",
-          label: "Expresses ideas clearly",
-          comments: [
-            "expressed ideas clearly during training discussions",
-            "expressed ideas clearly during sessions",
-            "was able to explain ideas clearly during discussions"
-          ]
-        },
-
-        {
-          key: "communication_confidence",
-          label: "Confident communication",
-          comments: [
-            "showed confidence when communicating during sessions",
-            "showed confidence when answering questions during training",
-            "communicated confidently during sessions"
-          ]
-        },
-
-        {
-          key: "communication_activities",
-          label: "Good communication during activities",
-          comments: [
-            "communicated effectively during discussions and activities",
-            "interacted well during discussions and training activities",
-            "showed good communication during training activities"
-          ]
-        }
-
+      good: [
+        "learned new concepts quickly",
+        "showed clear improvement throughout the training",
+        "improved based on the feedback provided",
+        "applied feedback effectively during training",
+        "adapted quickly to new topics and activities",
+        "showed strong motivation to improve and learn",
+        "demonstrated a good ability to learn new concepts"
       ],
 
       bad: [
-
-        {
-          key: "communication_with_trainees",
-          label: "Difficulty communicating with other trainees",
-          comments: [
-            "showed difficulty communicating with other trainees",
-            "had difficulty communicating with other trainees"
-          ]
-        },
-
-        {
-          key: "aggressive_communication",
-          label: "Aggressive communication",
-          comments: [
-            "showed an aggressive attitude and had difficulty communicating well with colleagues",
-            "showed an aggressive attitude when communicating with colleagues"
-          ]
-        }
-
-      ]
-    },
-
-
-    {
-      category: "Participation",
-
-      positive: [
-
-        {
-          key: "active_in_sessions",
-          label: "Active in sessions",
-          comments: [
-            "was active during sessions",
-            "participated well during sessions",
-            "actively participated in sessions",
-            "showed good participation during sessions",
-            "was engaged during sessions"
-          ]
-        },
-
-        {
-          key: "active_in_discussions",
-          label: "Active in discussions",
-          comments: [
-            "was active during discussions",
-            "participated actively in discussions",
-            "maintained active participation during discussions",
-            "showed good engagement during discussions"
-          ]
-        },
-
-        {
-          key: "answers_when_asked",
-          label: "Answers questions when asked",
-          comments: [
-            "answered questions when asked",
-            "responded well when asked questions",
-            "was responsive during sessions",
-            "actively answered questions during sessions",
-            "participated when asked during sessions",
-            "responded well to questions during sessions"
-          ]
-        },
-
-        {
-          key: "participates_in_activities",
-          label: "Participates in activities",
-          comments: [
-            "participated well in training activities",
-            "was active during training activities",
-            "contributed positively during group activities",
-            "showed willingness to participate in different activities"
-          ]
-        },
-
-        {
-          key: "outstanding_participation",
-          label: "Outstanding participation",
-          comments: [
-            "showed outstanding participation throughout the training",
-            "stood out through active participation throughout the training",
-            "showed excellent participation throughout the training"
-          ]
-        }
-
-      ],
-
-      bad: [
-
-        {
-          key: "low_participation",
-          label: "Low participation",
-          comments: [
-            "showed lack of participation based on daily tasks",
-            "showed low participation during daily tasks",
-            "did not participate enough in daily tasks"
-          ]
-        }
-
-      ]
-    },
-
-
-    {
-      category: "Learning & Improvement",
-
-      positive: [
-
-        {
-          key: "learns_quickly",
-          label: "Learns quickly",
-          comments: [
-            "learns quickly",
-            "demonstrated the ability to learn new concepts quickly",
-            "showed a good ability to learn new concepts quickly"
-          ]
-        },
-
-        {
-          key: "motivation_to_improve",
-          label: "Motivated to improve",
-          comments: [
-            "showed strong motivation to improve and learn",
-            "showed strong motivation to improve",
-            "was motivated to learn and improve"
-          ]
-        },
-
-        {
-          key: "applies_feedback",
-          label: "Applies feedback",
-          comments: [
-            "was receptive to feedback and applied it effectively",
-            "showed a good ability to apply the feedback provided",
-            "applied feedback effectively during training"
-          ]
-        },
-
-        {
-          key: "improves_with_feedback",
-          label: "Improves based on feedback",
-          comments: [
-            "showed improvement based on the feedback provided",
-            "improved after receiving feedback",
-            "showed clear improvement after receiving feedback"
-          ]
-        },
-
-        {
-          key: "adaptability",
-          label: "Adapts quickly",
-          comments: [
-            "adapted quickly to new topics and activities",
-            "demonstrated strong adaptability to different training activities",
-            "adapted well to different training activities"
-          ]
-        },
-
-        {
-          key: "excellent_learning",
-          label: "Excellent learning ability",
-          comments: [
-            "demonstrated excellent learning ability",
-            "showed excellent ability to learn new concepts",
-            "learned new concepts quickly during training"
-          ]
-        }
-
-      ],
-
-      bad: [
-
-        {
-          key: "absence_affects_learning",
-          label: "Absence affected understanding",
-          comments: [
-            "showed lack of understanding because of the absenteeism",
-            "had some gaps in understanding because of the absences"
-          ]
-        }
-
-      ]
-    },
-
-
-    {
-      category: "Commitment",
-
-      positive: [
-
-        {
-          key: "committed_to_training",
-          label: "Committed to training",
-          comments: [
-            "was highly committed to training",
-            "demonstrated good commitment to the training activities",
-            "showed strong commitment throughout the training"
-          ]
-        },
-
-        {
-          key: "daily_quizzes",
-          label: "Completes daily quizzes",
-          comments: [
-            "completed all daily quizzes successfully",
-            "showed good consistency in completing daily quizzes",
-            "completed the assigned daily quizzes successfully"
-          ]
-        },
-
-        {
-          key: "task_completion",
-          label: "Consistent with assigned tasks",
-          comments: [
-            "showed good consistency in completing assigned tasks",
-            "completed assigned activities within the required time",
-            "was consistent in completing assigned activities"
-          ]
-        },
-
-        {
-          key: "positive_attitude",
-          label: "Positive attitude",
-          comments: [
-            "maintained a positive attitude throughout the training",
-            "showed a positive attitude during training sessions",
-            "maintained a positive attitude toward the training"
-          ]
-        },
-
-        {
-          key: "willingness_to_learn",
-          label: "Willing to learn",
-          comments: [
-            "showed strong willingness to learn",
-            "showed good willingness to learn new topics",
-            "was willing to learn and improve during training"
-          ]
-        }
-
-      ],
-
-      bad: [
-
-        {
-          key: "asynchronous_commitment",
-          label: "Low commitment to asynchronous activities",
-          comments: [
-            "showed lack of commitment based on the asynchronous activities",
-            "showed low commitment to the asynchronous activities"
-          ]
-        }
-
+        "showed limited improvement throughout the training",
+        "needed repeated feedback on the same points",
+        "had difficulty applying the feedback provided",
+        "was slow to adapt to new topics",
+        "showed limited progress during the training"
       ]
     }
 
@@ -1341,36 +831,33 @@
      STORAGE
      ========================================================= */
 
-  const STORAGE_KEY = "trainee_feedback_builder_v6";
+  const STORAGE_KEY =
+    "trainee_feedback_builder_v7";
 
-  let trainees = [];
-
-
-  /* =========================================================
-     RANDOM COMMENT HISTORY
-     
-     This keeps recently used comments so the same sentence
-     is not repeatedly selected for different trainees.
-     ========================================================= */
 
   const RANDOM_HISTORY_KEY =
-    "trainee_feedback_random_history_v1";
+    "trainee_feedback_random_history_v2";
+
+
+  let trainees = [];
 
   let randomHistory = {};
 
 
   /* =========================================================
-     ID
+     CREATE ID
      ========================================================= */
 
   function createId() {
 
-    return "t_" +
+    return (
+      "t_" +
       Date.now().toString(36) +
       "_" +
       Math.random()
         .toString(36)
-        .substring(2, 9);
+        .substring(2, 9)
+    );
 
   }
 
@@ -1381,41 +868,30 @@
 
   function findTrainee(id) {
 
-    return trainees.find(function(trainee) {
-      return trainee.id === id;
-    });
+    return trainees.find(
+      function(trainee) {
+
+        return trainee.id === id;
+
+      }
+    );
 
   }
 
 
   /* =========================================================
-     FIND BEHAVIOR
+     FIND QUESTION
      ========================================================= */
 
-  function findBehavior(key) {
+  function findQuestion(key) {
 
-    for (let i = 0; i < feedbackLibrary.length; i++) {
+    return feedbackQuestions.find(
+      function(question) {
 
-      const category =
-        feedbackLibrary[i];
+        return question.key === key;
 
-      const all =
-        category.positive.concat(
-          category.bad
-        );
-
-      const behavior =
-        all.find(function(item) {
-          return item.key === key;
-        });
-
-      if (behavior) {
-        return behavior;
       }
-
-    }
-
-    return null;
+    ) || null;
 
   }
 
@@ -1433,13 +909,19 @@
           RANDOM_HISTORY_KEY
         );
 
+
       if (!saved) {
+
         randomHistory = {};
+
         return;
+
       }
+
 
       const parsed =
         JSON.parse(saved);
+
 
       randomHistory =
         parsed &&
@@ -1485,82 +967,91 @@
 
   /* =========================================================
      GET RANDOM COMMENT
+     
+     Prevents the same comment from being used repeatedly
+     for the same question until all comments are used.
      ========================================================= */
 
   function getRandomComment(
-    behaviorKey,
+    questionKey,
+    type,
     previousComment
   ) {
 
-    const behavior =
-      findBehavior(
-        behaviorKey
+    const question =
+      findQuestion(
+        questionKey
       );
 
-    if (
-      !behavior ||
-      !Array.isArray(
-        behavior.comments
-      ) ||
-      !behavior.comments.length
-    ) {
+
+    if (!question) {
       return "";
     }
 
 
     const comments =
-      behavior.comments;
+      type === "good"
+        ? question.good
+        : question.bad;
 
 
     if (
-      comments.length === 1
+      !Array.isArray(comments) ||
+      !comments.length
     ) {
 
-      return comments[0];
+      return "";
 
     }
 
 
+    const historyKey =
+      questionKey +
+      "_" +
+      type;
+
+
     if (
-      !randomHistory[behaviorKey] ||
+      !randomHistory[historyKey] ||
       !Array.isArray(
-        randomHistory[behaviorKey]
+        randomHistory[historyKey]
       )
     ) {
 
-      randomHistory[behaviorKey] = [];
+      randomHistory[historyKey] = [];
 
     }
 
 
     let history =
-      randomHistory[behaviorKey];
+      randomHistory[historyKey];
 
 
     /*
-      Keep only valid indexes
+      Remove invalid indexes.
     */
 
     history =
-      history.filter(function(index) {
+      history.filter(
+        function(index) {
 
-        return (
-          Number.isInteger(index) &&
-          index >= 0 &&
-          index < comments.length
-        );
+          return (
+            Number.isInteger(index) &&
+            index >= 0 &&
+            index < comments.length
+          );
 
-      });
+        }
+      );
 
 
     /*
-      If all comments have been used,
-      start a new cycle.
+      Start a new cycle when all comments
+      have already been used.
     */
 
     if (
-      history.length >=
-      comments.length
+      history.length >= comments.length
     ) {
 
       history = [];
@@ -1570,21 +1061,25 @@
 
     let available =
       comments
-        .map(function(_, index) {
-          return index;
-        })
-        .filter(function(index) {
+        .map(
+          function(_, index) {
+            return index;
+          }
+        )
+        .filter(
+          function(index) {
 
-          return !history.includes(
-            index
-          );
+            return !history.includes(
+              index
+            );
 
-        });
+          }
+        );
 
 
     /*
-      Avoid the previous comment
-      when possible.
+      Avoid the previous comment when
+      another option is available.
     */
 
     if (
@@ -1593,14 +1088,16 @@
     ) {
 
       available =
-        available.filter(function(index) {
+        available.filter(
+          function(index) {
 
-          return (
-            comments[index] !==
-            previousComment
-          );
+            return (
+              comments[index] !==
+              previousComment
+            );
 
-        });
+          }
+        );
 
     }
 
@@ -1608,9 +1105,11 @@
     if (!available.length) {
 
       available =
-        comments.map(function(_, index) {
-          return index;
-        });
+        comments.map(
+          function(_, index) {
+            return index;
+          }
+        );
 
     }
 
@@ -1629,7 +1128,7 @@
     );
 
 
-    randomHistory[behaviorKey] =
+    randomHistory[historyKey] =
       history;
 
 
@@ -1651,42 +1150,61 @@
 
     return {
 
-      id: createId(),
+      id:
+        createId(),
 
-      name: name,
+      name:
+        name,
 
-      gender: "He",
+      gender:
+        "He",
 
-      finalQuiz: "Passed",
+      finalQuiz:
+        "Passed",
 
       dailyQuiz:
         "Completed all daily quizzes successfully",
 
-      tardyEnabled: false,
+      tardyEnabled:
+        false,
 
-      tardyCount: 1,
+      tardyCount:
+        1,
 
-      absentEnabled: false,
+      absentEnabled:
+        false,
 
-      absentCount: 1,
+      absentCount:
+        1,
 
       /*
-        selected stores behavior keys only.
+        answers:
+
+        {
+          understanding: "good",
+          english: "bad",
+          role_play: "good",
+          participation_communication: "good",
+          improvement: "good"
+        }
       */
 
-      selected: [],
+      answers:
+        {},
 
       /*
         randomComments stores the actual
-        randomly selected sentence for
-        each behavior.
+        sentence chosen for each question.
       */
 
-      randomComments: {},
+      randomComments:
+        {},
 
-      custom: "",
+      custom:
+        "",
 
-      open: false
+      open:
+        false
 
     };
 
@@ -1704,15 +1222,24 @@
         "traineeNames"
       );
 
+
     const names =
       textarea.value
         .split("\n")
-        .map(function(name) {
-          return name.trim();
-        })
-        .filter(function(name) {
-          return name.length > 0;
-        });
+        .map(
+          function(name) {
+
+            return name.trim();
+
+          }
+        )
+        .filter(
+          function(name) {
+
+            return name.length > 0;
+
+          }
+        );
 
 
     if (!names.length) {
@@ -1726,16 +1253,19 @@
     }
 
 
-    names.forEach(function(name) {
+    names.forEach(
+      function(name) {
 
-      trainees.push(
-        createTrainee(name)
-      );
+        trainees.push(
+          createTrainee(name)
+        );
 
-    });
+      }
+    );
 
 
     textarea.value = "";
+
 
     saveData();
 
@@ -1761,10 +1291,12 @@
         "traineeList"
       );
 
+
     const count =
       document.getElementById(
         "traineeCount"
       );
+
 
     const search =
       document
@@ -1777,17 +1309,20 @@
 
 
     const filtered =
-      trainees.filter(function(trainee) {
+      trainees.filter(
+        function(trainee) {
 
-        if (!search) {
-          return true;
+          if (!search) {
+            return true;
+          }
+
+
+          return trainee.name
+            .toLowerCase()
+            .includes(search);
+
         }
-
-        return trainee.name
-          .toLowerCase()
-          .includes(search);
-
-      });
+      );
 
 
     count.textContent =
@@ -1822,14 +1357,16 @@
 
     list.innerHTML =
       filtered
-        .map(function(trainee, index) {
+        .map(
+          function(trainee, index) {
 
-          return createTraineeHTML(
-            trainee,
-            index
-          );
+            return createTraineeHTML(
+              trainee,
+              index
+            );
 
-        })
+          }
+        )
         .join("");
 
   }
@@ -1906,6 +1443,10 @@
 
         <div class="trainee-body">
 
+
+          <!-- =================================================
+               BASIC INFORMATION
+               ================================================= -->
 
           <div class="grid">
 
@@ -2050,7 +1591,7 @@
                       : ""
                   }
                 >
-                  missed daily quizzes, coaching was provided
+                  Missed daily quizzes, coaching was provided
                 </option>
 
               </select>
@@ -2061,7 +1602,9 @@
           </div>
 
 
-          <!-- ATTENDANCE -->
+          <!-- =================================================
+               ATTENDANCE
+               ================================================= -->
 
           <div class="attendance-section">
 
@@ -2069,8 +1612,11 @@
               Attendance & Commitment
             </div>
 
+
             <div class="attendance-grid">
 
+
+              <!-- TARDY -->
 
               <div class="attendance-item">
 
@@ -2125,6 +1671,7 @@
                     )"
                   >
 
+
                   <div
                     class="attendance-word"
                     id="tardy-word-${escapeAttribute(
@@ -2148,6 +1695,8 @@
 
               </div>
 
+
+              <!-- ABSENT -->
 
               <div class="attendance-item">
 
@@ -2202,6 +1751,7 @@
                     )"
                   >
 
+
                   <div
                     class="attendance-word"
                     id="absent-word-${escapeAttribute(
@@ -2231,41 +1781,27 @@
           </div>
 
 
-          <!-- FEEDBACK -->
+          <!-- =================================================
+               FEEDBACK QUESTIONS
+               ================================================= -->
 
           <div class="feedback-section">
 
             <div class="section-title">
-              Feedback Behaviors
+              Training Feedback
             </div>
 
 
-            <div class="feedback-search">
-
-              <input
-                id="feedback-search-${escapeAttribute(
-                  trainee.id
-                )}"
-                type="text"
-                placeholder="Search behaviors..."
-                oninput="filterFeedback(
-                  '${trainee.id}',
-                  this.value
-                )"
-              >
-
+            <div class="feedback-intro">
+              Answer each question based on the trainee's performance.
+              The system will automatically select a suitable comment.
             </div>
 
 
-            <div
-              id="feedback-box-${escapeAttribute(
-                trainee.id
-              )}"
-            >
+            <div class="question-list">
 
-              ${renderCategories(
-                trainee,
-                ""
+              ${renderFeedbackQuestions(
+                trainee
               )}
 
             </div>
@@ -2273,7 +1809,9 @@
           </div>
 
 
-          <!-- CUSTOM -->
+          <!-- =================================================
+               CUSTOM COMMENT
+               ================================================= -->
 
           <div class="custom-section">
 
@@ -2301,7 +1839,9 @@
           </div>
 
 
-          <!-- PREVIEW -->
+          <!-- =================================================
+               PREVIEW
+               ================================================= -->
 
           <div class="preview-section">
 
@@ -2327,7 +1867,9 @@
           </div>
 
 
-          <!-- ACTIONS -->
+          <!-- =================================================
+               ACTIONS
+               ================================================= -->
 
           <div class="card-actions">
 
@@ -2364,6 +1906,265 @@
 
 
   /* =========================================================
+     RENDER FEEDBACK QUESTIONS
+     ========================================================= */
+
+  function renderFeedbackQuestions(
+    trainee
+  ) {
+
+    return feedbackQuestions
+      .map(
+        function(question) {
+
+          const answer =
+            trainee.answers &&
+            trainee.answers[
+              question.key
+            ]
+              ? trainee.answers[
+                  question.key
+                ]
+              : "";
+
+
+          let stateText = "";
+
+
+          if (answer === "good") {
+
+            stateText =
+              "Good selected";
+
+          } else if (answer === "bad") {
+
+            stateText =
+              "Needs improvement selected";
+
+          }
+
+
+          return `
+
+            <div class="feedback-question">
+
+              <div class="question-text">
+
+                ${escapeHTML(
+                  question.question
+                )}
+
+              </div>
+
+
+              <div class="answer-buttons">
+
+                <button
+                  type="button"
+                  class="answer-btn good ${
+                    answer === "good"
+                      ? "selected"
+                      : ""
+                  }"
+                  onclick="setFeedbackAnswer(
+                    '${trainee.id}',
+                    '${question.key}',
+                    'good'
+                  )"
+                >
+                  Good
+                </button>
+
+
+                <button
+                  type="button"
+                  class="answer-btn bad ${
+                    answer === "bad"
+                      ? "selected"
+                      : ""
+                  }"
+                  onclick="setFeedbackAnswer(
+                    '${trainee.id}',
+                    '${question.key}',
+                    'bad'
+                  )"
+                >
+                  Needs Improvement
+                </button>
+
+              </div>
+
+
+              <div class="answer-state">
+
+                ${escapeHTML(
+                  stateText
+                )}
+
+              </div>
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+  }
+
+
+  /* =========================================================
+     SET FEEDBACK ANSWER
+     ========================================================= */
+
+  function setFeedbackAnswer(
+    id,
+    questionKey,
+    answer
+  ) {
+
+    const trainee =
+      findTrainee(id);
+
+
+    if (!trainee) {
+      return;
+    }
+
+
+    if (!trainee.answers) {
+
+      trainee.answers = {};
+
+    }
+
+
+    if (!trainee.randomComments) {
+
+      trainee.randomComments = {};
+
+    }
+
+
+    const previousAnswer =
+      trainee.answers[
+        questionKey
+      ];
+
+
+    /*
+      If clicking the same answer again,
+      remove the answer.
+    */
+
+    if (
+      previousAnswer === answer
+    ) {
+
+      delete trainee.answers[
+        questionKey
+      ];
+
+
+      delete trainee.randomComments[
+        questionKey
+      ];
+
+
+    } else {
+
+      /*
+        Save the new answer.
+      */
+
+      trainee.answers[
+        questionKey
+      ] = answer;
+
+
+      /*
+        Choose a new random comment.
+
+        If the trainer changes from Good to
+        Needs Improvement or vice versa,
+        the new side gets its own random comment.
+      */
+
+      trainee.randomComments[
+        questionKey
+      ] =
+        getRandomComment(
+          questionKey,
+          answer,
+          trainee.randomComments[
+            questionKey
+          ]
+        );
+
+    }
+
+
+    saveData();
+
+    updateFeedbackUI(
+      id
+    );
+
+    updatePreview(
+      id
+    );
+
+  }
+
+
+  /* =========================================================
+     UPDATE FEEDBACK UI
+     ========================================================= */
+
+  function updateFeedbackUI(
+    id
+  ) {
+
+    const trainee =
+      findTrainee(id);
+
+
+    if (!trainee) {
+      return;
+    }
+
+
+    const card =
+      document.getElementById(
+        "card-" + id
+      );
+
+
+    if (!card) {
+      return;
+    }
+
+
+    const questionList =
+      card.querySelector(
+        ".question-list"
+      );
+
+
+    if (questionList) {
+
+      questionList.innerHTML =
+        renderFeedbackQuestions(
+          trainee
+        );
+
+    }
+
+  }
+
+
+  /* =========================================================
      TOGGLE TRAINEE
      ========================================================= */
 
@@ -2372,300 +2173,19 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
+
 
     trainee.open =
       !trainee.open;
 
+
     saveData();
 
     render();
-
-  }
-
-
-  /* =========================================================
-     RENDER CATEGORIES
-     ========================================================= */
-
-  function renderCategories(
-    trainee,
-    search
-  ) {
-
-    const query =
-      String(search || "")
-        .toLowerCase()
-        .trim();
-
-
-    return feedbackLibrary
-      .map(function(
-        category,
-        categoryIndex
-      ) {
-
-
-        const positive =
-          category.positive
-            .map(function(
-              item,
-              itemIndex
-            ) {
-
-              return {
-                item: item,
-                itemIndex: itemIndex,
-                type: "positive"
-              };
-
-            })
-            .filter(function(entry) {
-
-              return (
-                !query ||
-                entry.item.label
-                  .toLowerCase()
-                  .includes(query)
-              );
-
-            });
-
-
-        const bad =
-          category.bad
-            .map(function(
-              item,
-              itemIndex
-            ) {
-
-              return {
-                item: item,
-                itemIndex: itemIndex,
-                type: "bad"
-              };
-
-            })
-            .filter(function(entry) {
-
-              return (
-                !query ||
-                entry.item.label
-                  .toLowerCase()
-                  .includes(query)
-              );
-
-            });
-
-
-        if (
-          !positive.length &&
-          !bad.length
-        ) {
-
-          return "";
-
-        }
-
-
-        const hasMatch =
-          query.length > 0;
-
-
-        return `
-
-          <details
-            class="category"
-            ${hasMatch ? "open" : ""}
-          >
-
-            <summary
-              class="category-summary"
-            >
-
-              ${escapeHTML(
-                category.category
-              )}
-
-            </summary>
-
-
-            <div class="category-content">
-
-
-              ${
-                positive.length
-                  ? `
-
-                    <div class="category-type">
-                      Positive
-                    </div>
-
-                    <div class="checkbox-list">
-
-                      ${
-                        positive
-                          .map(function(entry) {
-
-                            const checked =
-                              trainee.selected
-                                .includes(
-                                  entry.item.key
-                                );
-
-
-                            return `
-
-                              <label
-                                class="check-item"
-                              >
-
-                                <input
-                                  type="checkbox"
-                                  ${
-                                    checked
-                                      ? "checked"
-                                      : ""
-                                  }
-                                  onchange="toggleComment(
-                                    '${trainee.id}',
-                                    ${categoryIndex},
-                                    ${entry.itemIndex},
-                                    'positive'
-                                  )"
-                                >
-
-                                <span>
-                                  ${escapeHTML(
-                                    entry.item.label
-                                  )}
-                                </span>
-
-                              </label>
-
-                            `;
-
-                          })
-                          .join("")
-                      }
-
-                    </div>
-
-                  `
-                  : ""
-              }
-
-
-              ${
-                bad.length
-                  ? `
-
-                    <div class="category-type">
-                      Needs Improvement
-                    </div>
-
-                    <div class="checkbox-list">
-
-                      ${
-                        bad
-                          .map(function(entry) {
-
-                            const checked =
-                              trainee.selected
-                                .includes(
-                                  entry.item.key
-                                );
-
-
-                            return `
-
-                              <label
-                                class="check-item"
-                              >
-
-                                <input
-                                  type="checkbox"
-                                  ${
-                                    checked
-                                      ? "checked"
-                                      : ""
-                                  }
-                                  onchange="toggleComment(
-                                    '${trainee.id}',
-                                    ${categoryIndex},
-                                    ${entry.itemIndex},
-                                    'bad'
-                                  )"
-                                >
-
-                                <span>
-                                  ${escapeHTML(
-                                    entry.item.label
-                                  )}
-                                </span>
-
-                              </label>
-
-                            `;
-
-                          })
-                          .join("")
-                      }
-
-                    </div>
-
-                  `
-                  : ""
-              }
-
-
-            </div>
-
-          </details>
-
-        `;
-
-      })
-      .join("");
-
-  }
-
-
-  /* =========================================================
-     FILTER FEEDBACK
-     ========================================================= */
-
-  function filterFeedback(
-    id,
-    search
-  ) {
-
-    const trainee =
-      findTrainee(id);
-
-    if (!trainee) {
-      return;
-    }
-
-
-    const box =
-      document.getElementById(
-        "feedback-box-" + id
-      );
-
-
-    if (!box) {
-      return;
-    }
-
-
-    box.innerHTML =
-      renderCategories(
-        trainee,
-        search
-      );
 
   }
 
@@ -2681,6 +2201,7 @@
 
     const trainee =
       findTrainee(id);
+
 
     if (!trainee) {
       return;
@@ -2726,6 +2247,7 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
@@ -2737,7 +2259,9 @@
 
     saveData();
 
-    updatePreview(id);
+    updatePreview(
+      id
+    );
 
   }
 
@@ -2754,6 +2278,7 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
@@ -2765,126 +2290,9 @@
 
     saveData();
 
-    updatePreview(id);
-
-  }
-
-
-  /* =========================================================
-     TOGGLE BEHAVIOR
-     ========================================================= */
-
-  function toggleComment(
-    id,
-    categoryIndex,
-    itemIndex,
-    type
-  ) {
-
-    const trainee =
-      findTrainee(id);
-
-    if (!trainee) {
-      return;
-    }
-
-
-    const category =
-      feedbackLibrary[
-        categoryIndex
-      ];
-
-
-    if (!category) {
-      return;
-    }
-
-
-    const list =
-      type === "positive"
-        ? category.positive
-        : category.bad;
-
-
-    const behavior =
-      list[itemIndex];
-
-
-    if (!behavior) {
-      return;
-    }
-
-
-    const key =
-      behavior.key;
-
-
-    const existingIndex =
-      trainee.selected.indexOf(
-        key
-      );
-
-
-    if (
-      existingIndex === -1
-    ) {
-
-      /*
-        Select behavior.
-        Choose one random comment
-        and save it for this trainee.
-      */
-
-      trainee.selected.push(
-        key
-      );
-
-
-      if (
-        !trainee.randomComments ||
-        typeof trainee.randomComments !== "object"
-      ) {
-
-        trainee.randomComments = {};
-
-      }
-
-
-      trainee.randomComments[key] =
-        getRandomComment(
-          key,
-          trainee.randomComments[key]
-        );
-
-
-    } else {
-
-      /*
-        Remove behavior.
-      */
-
-      trainee.selected.splice(
-        existingIndex,
-        1
-      );
-
-
-      if (
-        trainee.randomComments
-      ) {
-
-        delete trainee.randomComments[
-          key
-        ];
-
-      }
-
-    }
-
-
-    saveData();
-
-    updatePreview(id);
+    updatePreview(
+      id
+    );
 
   }
 
@@ -2902,6 +2310,7 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
@@ -2913,7 +2322,9 @@
 
     saveData();
 
-    renderCardBody(id);
+    renderCardBody(
+      id
+    );
 
   }
 
@@ -2930,6 +2341,7 @@
 
     const trainee =
       findTrainee(id);
+
 
     if (!trainee) {
       return;
@@ -2965,6 +2377,7 @@
 
     const trainee =
       findTrainee(id);
+
 
     if (!trainee) {
       return;
@@ -3024,6 +2437,7 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
@@ -3081,12 +2495,28 @@
     trainee
   ) {
 
+    if (!trainee) {
+      return "";
+    }
+
+
     const hasActualFeedback =
-      trainee.selected.length > 0 ||
+      (
+        trainee.answers &&
+        Object.keys(
+          trainee.answers
+        ).length > 0
+      ) ||
       trainee.custom.trim() !== "" ||
       trainee.tardyEnabled ||
       trainee.absentEnabled;
 
+
+    /*
+      We always have Final Quiz and Daily Quiz
+      available, but don't show a preview until
+      the trainer actually starts adding feedback.
+    */
 
     if (!hasActualFeedback) {
       return "";
@@ -3102,7 +2532,9 @@
         : "He";
 
 
-    /* Final quiz */
+    /* =======================================================
+       FINAL QUIZ
+       ======================================================= */
 
     if (
       trainee.finalQuiz === "Passed"
@@ -3123,7 +2555,9 @@
     }
 
 
-    /* Daily quizzes */
+    /* =======================================================
+       DAILY QUIZZES
+       ======================================================= */
 
     if (
       trainee.dailyQuiz ===
@@ -3143,80 +2577,102 @@
     }
 
 
-    /*
-      Selected behaviors
+    /* =======================================================
+       SELECTED FEEDBACK QUESTIONS
+       ======================================================= */
 
-      The behavior key is converted
-      into the saved random comment.
-    */
+    if (
+      trainee.answers &&
+      typeof trainee.answers === "object"
+    ) {
 
-    trainee.selected.forEach(
-      function(key) {
+      feedbackQuestions.forEach(
+        function(question) {
 
-        let comment = "";
-
-
-        if (
-          trainee.randomComments &&
-          trainee.randomComments[key]
-        ) {
-
-          comment =
-            trainee.randomComments[key];
-
-        }
-
-
-        /*
-          Fallback for older data or
-          missing random comment.
-        */
-
-        if (!comment) {
-
-          comment =
-            getRandomComment(
-              key
-            );
+          const answer =
+            trainee.answers[
+              question.key
+            ];
 
 
           if (
-            comment
+            answer !== "good" &&
+            answer !== "bad"
           ) {
 
-            if (
-              !trainee.randomComments
-            ) {
+            return;
+
+          }
+
+
+          let comment = "";
+
+
+          if (
+            trainee.randomComments &&
+            trainee.randomComments[
+              question.key
+            ]
+          ) {
+
+            comment =
+              trainee.randomComments[
+                question.key
+              ];
+
+          }
+
+
+          /*
+            Fallback if an old or incomplete
+            saved record does not contain a
+            random comment.
+          */
+
+          if (!comment) {
+
+            comment =
+              getRandomComment(
+                question.key,
+                answer
+              );
+
+
+            if (!trainee.randomComments) {
 
               trainee.randomComments = {};
 
             }
 
 
-            trainee.randomComments[key] =
+            trainee.randomComments[
+              question.key
+            ] =
               comment;
 
           }
 
-        }
 
-
-        if (
-          comment &&
-          comment.trim()
-        ) {
-
-          parts.push(
+          if (
+            comment &&
             comment.trim()
-          );
+          ) {
+
+            parts.push(
+              comment.trim()
+            );
+
+          }
 
         }
+      );
 
-      }
-    );
+    }
 
 
-    /* Attendance */
+    /* =======================================================
+       ATTENDANCE
+       ======================================================= */
 
     const attendance =
       buildAttendanceComment(
@@ -3233,9 +2689,12 @@
     }
 
 
-    /* Custom */
+    /* =======================================================
+       CUSTOM COMMENT
+       ======================================================= */
 
     if (
+      trainee.custom &&
       trainee.custom.trim()
     ) {
 
@@ -3253,12 +2712,14 @@
 
     let result =
       parts
-        .filter(function(part) {
+        .filter(
+          function(part) {
 
-          return String(part)
-            .trim() !== "";
+            return String(part)
+              .trim() !== "";
 
-        })
+          }
+        )
         .join(", ");
 
 
@@ -3274,7 +2735,9 @@
 
 
     if (result) {
+
       result += ".";
+
     }
 
 
@@ -3571,6 +3034,7 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
@@ -3627,6 +3091,7 @@
     const trainee =
       findTrainee(id);
 
+
     if (!trainee) {
       return;
     }
@@ -3675,31 +3140,35 @@
 
     const blocks =
       trainees
-        .map(function(trainee) {
+        .map(
+          function(trainee) {
 
-          const feedback =
-            generateFeedback(
-              trainee
+            const feedback =
+              generateFeedback(
+                trainee
+              );
+
+
+            if (!feedback.trim()) {
+              return "";
+            }
+
+
+            return (
+              trainee.name.trim() +
+              ":\n" +
+              feedback
             );
 
-
-          if (!feedback.trim()) {
-            return "";
           }
+        )
+        .filter(
+          function(block) {
 
+            return block !== "";
 
-          return (
-            trainee.name.trim() +
-            ":\n" +
-            feedback
-          );
-
-        })
-        .filter(function(block) {
-
-          return block !== "";
-
-        });
+          }
+        );
 
 
     if (!blocks.length) {
@@ -3739,20 +3208,24 @@
         .writeText(
           text
         )
-        .then(function() {
+        .then(
+          function() {
 
-          showToast(
-            "Copied successfully."
-          );
+            showToast(
+              "Copied successfully."
+            );
 
-        })
-        .catch(function() {
+          }
+        )
+        .catch(
+          function() {
 
-          fallbackCopy(
-            text
-          );
+            fallbackCopy(
+              text
+            );
 
-        });
+          }
+        );
 
 
       return;
@@ -3838,6 +3311,7 @@
 
     const trainee =
       findTrainee(id);
+
 
     if (!trainee) {
       return;
@@ -3975,126 +3449,6 @@
 
 
   /* =========================================================
-     MIGRATE OLD V5 COMMENTS
-     
-     If the browser already contains old data,
-     try to convert old selected comment text
-     into the new behavior keys.
-     ========================================================= */
-
-  function migrateOldSelection(
-    oldSelected
-  ) {
-
-    if (
-      !Array.isArray(
-        oldSelected
-      )
-    ) {
-
-      return {
-        selected: [],
-        randomComments: {}
-      };
-
-    }
-
-
-    const selected = [];
-    const randomComments = {};
-
-
-    oldSelected.forEach(
-      function(oldComment) {
-
-        if (
-          typeof oldComment !==
-          "string"
-        ) {
-          return;
-        }
-
-
-        for (
-          let i = 0;
-          i < feedbackLibrary.length;
-          i++
-        ) {
-
-          const category =
-            feedbackLibrary[i];
-
-
-          const all =
-            category.positive.concat(
-              category.bad
-            );
-
-
-          let found =
-            null;
-
-
-          for (
-            let j = 0;
-            j < all.length;
-            j++
-          ) {
-
-            if (
-              all[j].comments.includes(
-                oldComment
-              )
-            ) {
-
-              found =
-                all[j];
-
-              break;
-
-            }
-
-          }
-
-
-          if (found) {
-
-            if (
-              !selected.includes(
-                found.key
-              )
-            ) {
-
-              selected.push(
-                found.key
-              );
-
-              randomComments[
-                found.key
-              ] =
-                oldComment;
-
-            }
-
-            break;
-
-          }
-
-        }
-
-      }
-    );
-
-
-    return {
-      selected: selected,
-      randomComments: randomComments
-    };
-
-  }
-
-
-  /* =========================================================
      LOAD
      ========================================================= */
 
@@ -4102,30 +3456,40 @@
 
     try {
 
+      /*
+        First use V7.
+
+        If V7 doesn't exist, try the previous
+        V6 storage so trainee names and basic
+        information are not lost.
+
+        Old feedback selections that no longer
+        belong to the new 5-question system
+        are intentionally not carried over.
+      */
+
       let saved =
         localStorage.getItem(
           STORAGE_KEY
         );
 
 
-      /*
-        If V6 doesn't exist, check V5.
-      */
+      if (!saved) {
+
+        saved =
+          localStorage.getItem(
+            "trainee_feedback_builder_v6"
+          );
+
+      }
+
 
       if (!saved) {
 
-        const oldSaved =
+        saved =
           localStorage.getItem(
             "trainee_feedback_builder_v5"
           );
-
-
-        if (oldSaved) {
-
-          saved =
-            oldSaved;
-
-        }
 
       }
 
@@ -4158,86 +3522,73 @@
         parsed.map(
           function(trainee) {
 
-
-            let selected = [];
-
-            let randomComments = {};
-
-
             /*
-              New format
+              Keep only valid new answers.
             */
 
+            const answers = {};
+
+
             if (
-              Array.isArray(
-                trainee.selected
-              ) &&
-              trainee.selected.every(
-                function(item) {
-
-                  return (
-                    typeof item ===
-                    "string" &&
-                    findBehavior(
-                      item
-                    ) !== null
-                  );
-
-                }
-              )
+              trainee.answers &&
+              typeof trainee.answers ===
+              "object"
             ) {
 
-              selected =
-                trainee.selected.slice();
+              feedbackQuestions.forEach(
+                function(question) {
+
+                  const answer =
+                    trainee.answers[
+                      question.key
+                    ];
 
 
-              randomComments =
-                trainee.randomComments &&
-                typeof trainee.randomComments ===
-                "object"
-                  ? {
-                      ...trainee.randomComments
-                    }
-                  : {};
+                  if (
+                    answer === "good" ||
+                    answer === "bad"
+                  ) {
 
-            } else {
+                    answers[
+                      question.key
+                    ] = answer;
 
-              /*
-                Old V5 format
-              */
+                  }
 
-              const migrated =
-                migrateOldSelection(
-                  trainee.selected
-                );
-
-
-              selected =
-                migrated.selected;
-
-
-              randomComments =
-                migrated.randomComments;
+                }
+              );
 
             }
 
 
             /*
-              Make sure every selected
-              behavior has a comment.
+              If this is old V6 data,
+              don't use its old comment keys.
+              The new system has only five questions.
             */
 
-            selected.forEach(
-              function(key) {
+            const randomComments = {};
+
+
+            feedbackQuestions.forEach(
+              function(question) {
 
                 if (
-                  !randomComments[key]
+                  answers[
+                    question.key
+                  ] &&
+                  trainee.randomComments &&
+                  trainee.randomComments[
+                    question.key
+                  ]
                 ) {
 
-                  randomComments[key] =
-                    getRandomComment(
-                      key
-                    );
+                  randomComments[
+                    question.key
+                  ] =
+                    trainee.randomComments[
+                      question.key
+                    ];
 
                 }
 
@@ -4303,8 +3654,8 @@
                 ),
 
 
-              selected:
-                selected,
+              answers:
+                answers,
 
 
               randomComments:
@@ -4316,7 +3667,8 @@
                 "",
 
 
-              open: false
+              open:
+                false
 
             };
 
