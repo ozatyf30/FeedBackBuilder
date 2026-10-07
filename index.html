@@ -631,7 +631,6 @@
     }
 
     @media (max-width: 800px) {
-
       .grid {
         grid-template-columns: 1fr;
       }
@@ -665,7 +664,6 @@
     }
 
     @media (max-width: 520px) {
-
       body {
         padding: 15px 10px 40px;
       }
@@ -752,12 +750,10 @@
 
   <div class="header">
     <h1>Trainee Feedback Builder</h1>
-
     <p>
       Create individualized training feedback quickly and consistently.
     </p>
   </div>
-
 
   <div class="input-section">
 
@@ -810,7 +806,6 @@
 
   </div>
 
-
   <div class="toolbar">
 
     <div
@@ -822,14 +817,12 @@
 
   </div>
 
-
   <div
     id="traineeList"
     class="trainee-list"
   ></div>
 
 </div>
-
 
 <div
   id="toast"
@@ -1529,21 +1522,19 @@ const caseTypeLabels = {
     }
 
   ];
-  /* =========================================================
-     STORAGE
-     ========================================================= */
-
+/* =========================================================
+   STORAGE
+   ========================================================= */
 
 const STORAGE_KEY =
-  "trainee_feedback_builder_v9";
-
-const RANDOM_HISTORY_KEY =
-  "trainee_feedback_random_history_v3";
+  "trainee_feedback_builder_v11";
 
 let trainees = [];
 
-let randomHistory = {};
 
+/* =========================================================
+   BASIC HELPERS
+   ========================================================= */
 
 function createId() {
 
@@ -1581,71 +1572,20 @@ function findQuestion(key) {
 }
 
 
-function loadRandomHistory() {
-
-  try {
-
-    const saved =
-      localStorage.getItem(
-        RANDOM_HISTORY_KEY
-      );
-
-    if (!saved) {
-
-      randomHistory = {};
-
-      return;
-
-    }
-
-    const parsed =
-      JSON.parse(saved);
-
-    randomHistory =
-      parsed &&
-      typeof parsed === "object"
-        ? parsed
-        : {};
-
-  } catch (error) {
-
-    randomHistory = {};
-
-  }
-
-}
-
-
-function saveRandomHistory() {
-
-  try {
-
-    localStorage.setItem(
-      RANDOM_HISTORY_KEY,
-      JSON.stringify(
-        randomHistory
-      )
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Could not save random history:",
-      error
-    );
-
-  }
-
-}
-
+/* =========================================================
+   RANDOM SYSTEM
+   EACH TRAINEE HAS ITS OWN HISTORY
+   ========================================================= */
 
 function getRandomFromPool(
+  trainee,
   historyKey,
   comments,
   previousComment
 ) {
 
   if (
+    !trainee ||
     !Array.isArray(comments) ||
     !comments.length
   ) {
@@ -1655,20 +1595,27 @@ function getRandomFromPool(
   }
 
 
+  if (!trainee.randomHistory) {
+
+    trainee.randomHistory = {};
+
+  }
+
+
   if (
-    !randomHistory[historyKey] ||
+    !trainee.randomHistory[historyKey] ||
     !Array.isArray(
-      randomHistory[historyKey]
+      trainee.randomHistory[historyKey]
     )
   ) {
 
-    randomHistory[historyKey] = [];
+    trainee.randomHistory[historyKey] = [];
 
   }
 
 
   let history =
-    randomHistory[historyKey];
+    trainee.randomHistory[historyKey];
 
 
   history =
@@ -1684,6 +1631,12 @@ function getRandomFromPool(
       }
     );
 
+
+  /*
+    When THIS trainee has used all
+    comments in this pool, start a new
+    cycle for THIS trainee only.
+  */
 
   if (
     history.length >= comments.length
@@ -1712,6 +1665,11 @@ function getRandomFromPool(
       );
 
 
+  /*
+    Avoid immediately repeating the
+    previous comment when possible.
+  */
+
   if (
     previousComment &&
     available.length > 1
@@ -1728,6 +1686,7 @@ function getRandomFromPool(
 
         }
       );
+
 
     if (filtered.length) {
 
@@ -1765,56 +1724,21 @@ function getRandomFromPool(
   );
 
 
-  randomHistory[historyKey] =
+  trainee.randomHistory[historyKey] =
     history;
 
 
-  saveRandomHistory();
-
-
-  return comments[
-    randomIndex
-  ];
+  return comments[randomIndex];
 
 }
 
 
-function shuffleArray(array) {
-
-  const shuffled =
-    [...array];
-
-
-  for (
-    let i = shuffled.length - 1;
-    i > 0;
-    i--
-  ) {
-
-    const j =
-      Math.floor(
-        Math.random() *
-        (i + 1)
-      );
-
-
-    [
-      shuffled[i],
-      shuffled[j]
-    ] = [
-      shuffled[j],
-      shuffled[i]
-    ];
-
-  }
-
-
-  return shuffled;
-
-}
-
+/* =========================================================
+   QUESTION RANDOM COMMENTS
+   ========================================================= */
 
 function getRandomComment(
+  trainee,
   questionKey,
   type,
   previousComment
@@ -1838,6 +1762,7 @@ function getRandomComment(
 
 
   return getRandomFromPool(
+    trainee,
     questionKey + "_" + type,
     comments,
     previousComment
@@ -1846,14 +1771,23 @@ function getRandomComment(
 }
 
 
+/* =========================================================
+   UNDERSTANDING PERFORMANCE RANDOM
+   ========================================================= */
+
 function getRandomPerformanceComment(
+  trainee,
   understandingAnswer,
   progress,
   previousComment
 ) {
 
-  if (progress === "select_cases") {
+  if (
+    progress === "select_cases"
+  ) {
+
     return "";
+
   }
 
 
@@ -1899,6 +1833,7 @@ function getRandomPerformanceComment(
 
 
   return getRandomFromPool(
+    trainee,
     historyKey,
     side[progress],
     previousComment
@@ -1906,6 +1841,91 @@ function getRandomPerformanceComment(
 
 }
 
+
+/* =========================================================
+   FEEDBACK ORDER SYSTEM
+   IMPORTANT:
+   ORDER ALSO BELONGS TO THE TRAINEE.
+   ========================================================= */
+
+function shuffleArray(array) {
+
+  const result =
+    Array.isArray(array)
+      ? array.slice()
+      : [];
+
+
+  for (
+    let i = result.length - 1;
+    i > 0;
+    i--
+  ) {
+
+    const j =
+      Math.floor(
+        Math.random() *
+        (i + 1)
+      );
+
+
+    const temp =
+      result[i];
+
+
+    result[i] =
+      result[j];
+
+
+    result[j] =
+      temp;
+
+  }
+
+
+  return result;
+
+}
+
+
+/*
+  Creates a new randomized order for
+  THIS trainee only.
+
+  The actual selected comments do NOT
+  change here. Only their positions change.
+*/
+
+function regenerateFeedbackOrder(
+  trainee
+) {
+
+  if (!trainee) {
+    return;
+  }
+
+
+  const parts =
+    getFeedbackParts(
+      trainee
+    );
+
+
+  trainee.feedbackOrder =
+    shuffleArray(
+      parts.map(
+        function(_, index) {
+          return index;
+        }
+      )
+    );
+
+}
+
+
+/* =========================================================
+   CREATE TRAINEE
+   ========================================================= */
 
 function createTrainee(name) {
 
@@ -1950,6 +1970,18 @@ function createTrainee(name) {
     randomComments:
       {},
 
+    randomHistory:
+      {},
+
+    /*
+      The final sentence order is also
+      stored per trainee so rendering
+      another trainee cannot change it.
+    */
+
+    feedbackOrder:
+      [],
+
     understandingProgress:
       "",
 
@@ -1963,6 +1995,10 @@ function createTrainee(name) {
 
 }
 
+
+/* =========================================================
+   ADD TRAINEES
+   ========================================================= */
 
 function addTrainees() {
 
@@ -2023,6 +2059,10 @@ function addTrainees() {
 
 }
 
+
+/* =========================================================
+   RENDER
+   ========================================================= */
 
 function render() {
 
@@ -2110,6 +2150,10 @@ function render() {
 
 }
 
+
+/* =========================================================
+   TRAINEE HTML
+   ========================================================= */
 
 function createTraineeHTML(
   trainee,
@@ -2695,6 +2739,10 @@ function createTraineeHTML(
 }
 
 
+/* =========================================================
+   FEEDBACK QUESTIONS UI
+   ========================================================= */
+
 function renderFeedbackQuestions(
   trainee
 ) {
@@ -2775,11 +2823,6 @@ function renderFeedbackQuestions(
 
           let caseTypeHTML = "";
 
-
-          /*
-            Case Type appears ONLY when
-            Select Cases is selected.
-          */
 
           if (
             progress === "select_cases"
@@ -3002,6 +3045,10 @@ function renderFeedbackQuestions(
 }
 
 
+/* =========================================================
+   CAMERA
+   ========================================================= */
+
 function setCamera(
   id,
   value
@@ -3010,23 +3057,67 @@ function setCamera(
   const trainee =
     findTrainee(id);
 
+
   if (!trainee) {
     return;
   }
 
+
   trainee.camera =
     value;
 
+
+  if (!trainee.randomComments) {
+    trainee.randomComments = {};
+  }
+
+
+  if (!trainee.randomHistory) {
+    trainee.randomHistory = {};
+  }
+
+
+  /*
+    Selecting camera again generates
+    a new random camera comment for
+    THIS trainee.
+  */
+
   delete trainee.randomComments.camera;
+
+
+  const cameraType =
+    value === "always"
+      ? "good"
+      : "bad";
+
+
+  trainee.randomComments.camera =
+    getRandomFromPool(
+      trainee,
+      "camera_" + cameraType,
+      cameraComments[cameraType],
+      null
+    );
+
+
+  regenerateFeedbackOrder(
+    trainee
+  );
+
 
   saveData();
 
-  renderCardBody(id);
+  updateFeedbackUI(id);
 
   updatePreview(id);
 
 }
 
+
+/* =========================================================
+   CASE TYPE
+   ========================================================= */
 
 function setCaseType(
   id,
@@ -3035,6 +3126,7 @@ function setCaseType(
 
   const trainee =
     findTrainee(id);
+
 
   if (!trainee) {
     return;
@@ -3076,9 +3168,12 @@ function setCaseType(
 
 
   if (!trainee.randomComments) {
-
     trainee.randomComments = {};
+  }
 
+
+  if (!trainee.randomHistory) {
+    trainee.randomHistory = {};
   }
 
 
@@ -3097,6 +3192,7 @@ function setCaseType(
 
     trainee.randomComments.caseType =
       getRandomFromPool(
+        trainee,
         "caseType_" +
         trainee.caseType +
         "_" +
@@ -3108,6 +3204,11 @@ function setCaseType(
   }
 
 
+  regenerateFeedbackOrder(
+    trainee
+  );
+
+
   saveData();
 
   updateFeedbackUI(id);
@@ -3116,6 +3217,10 @@ function setCaseType(
 
 }
 
+
+/* =========================================================
+   MAIN QUESTION ANSWER
+   ========================================================= */
 
 function setFeedbackAnswer(
   id,
@@ -3133,16 +3238,17 @@ function setFeedbackAnswer(
 
 
   if (!trainee.answers) {
-
     trainee.answers = {};
-
   }
 
 
   if (!trainee.randomComments) {
-
     trainee.randomComments = {};
+  }
 
+
+  if (!trainee.randomHistory) {
+    trainee.randomHistory = {};
   }
 
 
@@ -3151,6 +3257,15 @@ function setFeedbackAnswer(
       questionKey
     ];
 
+
+  /*
+    Clicking the SAME selected answer
+    removes the answer.
+
+    When selected again later, the
+    random pool will choose a new
+    comment for this trainee.
+  */
 
   if (
     previousAnswer === answer
@@ -3181,7 +3296,6 @@ function setFeedbackAnswer(
         "understandingProgress"
       ];
 
-
       delete trainee.randomComments[
         "caseType"
       ];
@@ -3195,10 +3309,16 @@ function setFeedbackAnswer(
     ] = answer;
 
 
+    /*
+      NEW random comment for THIS
+      trainee when the answer changes.
+    */
+
     trainee.randomComments[
       questionKey
     ] =
       getRandomComment(
+        trainee,
         questionKey,
         answer,
         trainee.randomComments[
@@ -3222,7 +3342,6 @@ function setFeedbackAnswer(
         "understandingProgress"
       ];
 
-
       delete trainee.randomComments[
         "caseType"
       ];
@@ -3230,6 +3349,16 @@ function setFeedbackAnswer(
     }
 
   }
+
+
+  /*
+    Only THIS trainee gets a new
+    sentence order.
+  */
+
+  regenerateFeedbackOrder(
+    trainee
+  );
 
 
   saveData();
@@ -3240,6 +3369,10 @@ function setFeedbackAnswer(
 
 }
 
+
+/* =========================================================
+   UNDERSTANDING PROGRESS
+   ========================================================= */
 
 function setUnderstandingProgress(
   id,
@@ -3299,7 +3432,6 @@ function setUnderstandingProgress(
     trainee.understandingProgress =
       "";
 
-
     trainee.caseType =
       "";
 
@@ -3324,26 +3456,26 @@ function setUnderstandingProgress(
       value;
 
 
-    /*
-      Case Type is only relevant when
-      Select Cases is selected.
-    */
-
     trainee.caseType =
       "";
 
 
     if (!trainee.randomComments) {
-
       trainee.randomComments = {};
+    }
 
+
+    if (!trainee.randomHistory) {
+      trainee.randomHistory = {};
     }
 
 
     delete trainee.randomComments.caseType;
 
 
-    if (value === "select_cases") {
+    if (
+      value === "select_cases"
+    ) {
 
       delete trainee.randomComments[
         "understandingProgress"
@@ -3355,6 +3487,7 @@ function setUnderstandingProgress(
         "understandingProgress"
       ] =
         getRandomPerformanceComment(
+          trainee,
           understanding,
           value,
           trainee.randomComments[
@@ -3367,6 +3500,17 @@ function setUnderstandingProgress(
   }
 
 
+  /*
+    Changing performance status also
+    changes the final sentence order
+    for THIS trainee only.
+  */
+
+  regenerateFeedbackOrder(
+    trainee
+  );
+
+
   saveData();
 
   updateFeedbackUI(id);
@@ -3375,6 +3519,10 @@ function setUnderstandingProgress(
 
 }
 
+
+/* =========================================================
+   UPDATE FEEDBACK UI
+   ========================================================= */
 
 function updateFeedbackUI(
   id
@@ -3418,6 +3566,10 @@ function updateFeedbackUI(
 }
 
 
+/* =========================================================
+   OPEN / CLOSE TRAINEE
+   ========================================================= */
+
 function toggleTrainee(id) {
 
   const trainee =
@@ -3433,12 +3585,22 @@ function toggleTrainee(id) {
     !trainee.open;
 
 
+  /*
+    IMPORTANT:
+    We do NOT regenerate random comments
+    or feedback order here.
+  */
+
   saveData();
 
   render();
 
 }
 
+
+/* =========================================================
+   NAME
+   ========================================================= */
 
 function updateName(
   id,
@@ -3480,6 +3642,10 @@ function updateName(
 }
 
 
+/* =========================================================
+   GENERAL FIELD
+   ========================================================= */
+
 function updateField(
   id,
   field,
@@ -3499,12 +3665,22 @@ function updateField(
     value;
 
 
+  /*
+    General fields don't create a new
+    random comment. Therefore we keep
+    the current feedback order.
+  */
+
   saveData();
 
   updatePreview(id);
 
 }
 
+
+/* =========================================================
+   CUSTOM COMMENT
+   ========================================================= */
 
 function updateCustom(
   id,
@@ -3524,12 +3700,22 @@ function updateCustom(
     value;
 
 
+  /*
+    Do not reshuffle on every keystroke.
+    The selected random comments and
+    their order remain stable.
+  */
+
   saveData();
 
   updatePreview(id);
 
 }
 
+
+/* =========================================================
+   ATTENDANCE
+   ========================================================= */
 
 function toggleAttendance(
   id,
@@ -3549,6 +3735,11 @@ function toggleAttendance(
   trainee[field] =
     checked;
 
+
+  /*
+    Attendance is not a random comment.
+    Keep current order stable.
+  */
 
   saveData();
 
@@ -3642,6 +3833,10 @@ function updateAttendanceLabels(
 }
 
 
+/* =========================================================
+   RENDER CARD BODY
+   ========================================================= */
+
 function renderCardBody(
   id
 ) {
@@ -3684,111 +3879,80 @@ function renderCardBody(
 }
 
 
-function generateFeedback(
+/* =========================================================
+   GET FEEDBACK PARTS
+   IMPORTANT:
+   This function only READS the selected
+   comments. It does not generate random
+   comments and does not shuffle.
+   ========================================================= */
+
+function getFeedbackParts(
   trainee
 ) {
 
   if (!trainee) {
-    return "";
+    return [];
   }
 
 
-  const hasActualFeedback =
-    (
-      trainee.answers &&
-      Object.keys(
-        trainee.answers
-      ).length > 0
-    ) ||
-    trainee.custom.trim() !== "" ||
-    trainee.tardyEnabled ||
-    trainee.absentEnabled ||
-    trainee.camera !== "" ||
-    trainee.caseType !== "";
+  const parts = [];
 
 
-  if (!hasActualFeedback) {
-    return "";
-  }
-
-
-  const pronoun =
-    trainee.gender === "She"
-      ? "She"
-      : "He";
-
-
-  const feedbackParts = [];
-
+  /*
+    FINAL QUIZ
+  */
 
   if (
     trainee.finalQuiz === "Passed"
   ) {
 
-    feedbackParts.push(
+    parts.push(
       "passed the final quiz successfully"
     );
 
   } else {
 
-    feedbackParts.push(
+    parts.push(
       "did not pass the final quiz"
     );
 
   }
 
 
+  /*
+    DAILY QUIZZES
+  */
+
   if (
     trainee.dailyQuiz ===
     "Completed all daily quizzes successfully"
   ) {
 
-    feedbackParts.push(
+    parts.push(
       "completed all daily quizzes successfully"
     );
 
   } else {
 
-    feedbackParts.push(
+    parts.push(
       "missed daily quizzes, coaching was provided"
     );
 
   }
 
 
+  /*
+    CAMERA
+  */
+
   if (trainee.camera) {
 
-    const cameraType =
-      trainee.camera === "always"
-        ? "good"
-        : "bad";
-
-
-    if (!trainee.randomComments) {
-
-      trainee.randomComments = {};
-
-    }
-
-
-    let cameraComment =
-      trainee.randomComments.camera;
-
-
-    if (!cameraComment) {
-
-      cameraComment =
-        getRandomFromPool(
-          `camera_${cameraType}`,
-          cameraComments[cameraType],
-          null
-        );
-
-
-      trainee.randomComments.camera =
-        cameraComment;
-
-    }
+    const cameraComment =
+      trainee.randomComments &&
+      trainee.randomComments.camera
+        ? trainee.randomComments.camera
+        : "";
 
 
     if (
@@ -3796,7 +3960,7 @@ function generateFeedback(
       cameraComment.trim()
     ) {
 
-      feedbackParts.push(
+      parts.push(
         cameraComment.trim()
       );
 
@@ -3804,6 +3968,10 @@ function generateFeedback(
 
   }
 
+
+  /*
+    QUESTIONS
+  */
 
   if (
     trainee.answers &&
@@ -3829,46 +3997,15 @@ function generateFeedback(
         }
 
 
-        let comment = "";
-
-
-        if (
+        const comment =
           trainee.randomComments &&
           trainee.randomComments[
             question.key
           ]
-        ) {
-
-          comment =
-            trainee.randomComments[
-              question.key
-            ];
-
-        }
-
-
-        if (!comment) {
-
-          comment =
-            getRandomComment(
-              question.key,
-              answer
-            );
-
-
-          if (!trainee.randomComments) {
-
-            trainee.randomComments = {};
-
-          }
-
-
-          trainee.randomComments[
-            question.key
-          ] =
-            comment;
-
-        }
+            ? trainee.randomComments[
+                question.key
+              ]
+            : "";
 
 
         if (
@@ -3876,12 +4013,16 @@ function generateFeedback(
           comment.trim()
         ) {
 
-          feedbackParts.push(
+          parts.push(
             comment.trim()
           );
 
         }
 
+
+        /*
+          UNDERSTANDING PERFORMANCE
+        */
 
         if (
           question.key === "understanding" &&
@@ -3906,7 +4047,7 @@ function generateFeedback(
             progressComment.trim()
           ) {
 
-            feedbackParts.push(
+            parts.push(
               progressComment.trim()
             );
 
@@ -3915,60 +4056,26 @@ function generateFeedback(
         }
 
 
+        /*
+          CASE TYPE
+        */
+
         if (
           question.key === "understanding" &&
-          (answer === "good" || answer === "bad") &&
+          (
+            answer === "good" ||
+            answer === "bad"
+          ) &&
           trainee.understandingProgress ===
           "select_cases" &&
           trainee.caseType
         ) {
 
-          let caseComment =
+          const caseComment =
             trainee.randomComments &&
             trainee.randomComments.caseType
               ? trainee.randomComments.caseType
               : "";
-
-
-          if (!caseComment) {
-
-            const pool =
-              caseTypeComments[
-                trainee.caseType
-              ] &&
-              caseTypeComments[
-                trainee.caseType
-              ][
-                answer
-              ];
-
-
-            if (pool && pool.length) {
-
-              caseComment =
-                getRandomFromPool(
-                  "caseType_" +
-                  trainee.caseType +
-                  "_" +
-                  answer,
-                  pool,
-                  null
-                );
-
-
-              if (!trainee.randomComments) {
-
-                trainee.randomComments = {};
-
-              }
-
-
-              trainee.randomComments.caseType =
-                caseComment;
-
-            }
-
-          }
 
 
           if (
@@ -3976,7 +4083,7 @@ function generateFeedback(
             caseComment.trim()
           ) {
 
-            feedbackParts.push(
+            parts.push(
               caseComment.trim()
             );
 
@@ -3990,6 +4097,10 @@ function generateFeedback(
   }
 
 
+  /*
+    ATTENDANCE
+  */
+
   const attendance =
     buildAttendanceComment(
       trainee
@@ -3998,49 +4109,175 @@ function generateFeedback(
 
   if (attendance) {
 
-    feedbackParts.push(
+    parts.push(
       attendance
     );
 
   }
 
 
-  const shuffledParts =
-    shuffleArray(
-      feedbackParts
-    );
-
+  /*
+    CUSTOM COMMENT
+  */
 
   if (
     trainee.custom &&
     trainee.custom.trim()
   ) {
 
-    shuffledParts.push(
+    parts.push(
       trainee.custom.trim()
     );
 
   }
 
 
-  if (!shuffledParts.length) {
+  return parts;
+
+}
+
+
+/* =========================================================
+   GENERATE FEEDBACK
+   IMPORTANT:
+   READ-ONLY.
+   DOES NOT RANDOMIZE.
+   DOES NOT CHANGE TRAINEE DATA.
+   ========================================================= */
+
+function generateFeedback(
+  trainee
+) {
+
+  if (!trainee) {
     return "";
   }
+
+
+  const hasActualFeedback =
+    (
+      trainee.answers &&
+      Object.keys(
+        trainee.answers
+      ).length > 0
+    ) ||
+    (trainee.custom || "").trim() !== "" ||
+    trainee.tardyEnabled ||
+    trainee.absentEnabled ||
+    trainee.camera !== "" ||
+    trainee.caseType !== "";
+
+
+  if (!hasActualFeedback) {
+    return "";
+  }
+
+
+  const pronoun =
+    trainee.gender === "She"
+      ? "She"
+      : "He";
+
+
+  const parts =
+    getFeedbackParts(
+      trainee
+    );
+
+
+  if (!parts.length) {
+    return "";
+  }
+
+
+  /*
+    The order belongs to THIS trainee.
+
+    If an old saved trainee has no
+    feedbackOrder yet, create it once.
+    This does NOT change any comments.
+  */
+
+  let order =
+    Array.isArray(
+      trainee.feedbackOrder
+    )
+      ? trainee.feedbackOrder
+      : [];
+
+
+  const validOrder =
+    order.filter(
+      function(index) {
+
+        return (
+          Number.isInteger(index) &&
+          index >= 0 &&
+          index < parts.length
+        );
+
+      }
+    );
+
+
+  /*
+    If the number of current parts does
+    not match the stored order, create a
+    stable order without random comments.
+  */
+
+  if (
+    validOrder.length !==
+    parts.length
+  ) {
+
+    order =
+      shuffleArray(
+        parts.map(
+          function(_, index) {
+            return index;
+          }
+        )
+      );
+
+  } else {
+
+    /*
+      Keep stored order.
+      Do NOT shuffle during render.
+    */
+
+    order =
+      validOrder;
+
+  }
+
+
+  const orderedParts =
+    order
+      .map(
+        function(index) {
+          return parts[index];
+        }
+      )
+      .filter(
+        function(part) {
+
+          return (
+            String(part)
+              .trim() !== ""
+          );
+
+        }
+      );
 
 
   let result =
     pronoun +
     " " +
-    shuffledParts
-      .filter(
-        function(part) {
-
-          return String(part)
-            .trim() !== "";
-
-        }
-      )
-      .join(", ");
+    orderedParts.join(
+      ", "
+    );
 
 
   result =
@@ -4055,9 +4292,7 @@ function generateFeedback(
 
 
   if (result) {
-
     result += ".";
-
   }
 
 
@@ -4065,6 +4300,10 @@ function generateFeedback(
 
 }
 
+
+/* =========================================================
+   ATTENDANCE COMMENT
+   ========================================================= */
 
 function buildAttendanceComment(
   trainee
@@ -4134,6 +4373,10 @@ function buildAttendanceComment(
 
 }
 
+
+/* =========================================================
+   NUMBER HELPERS
+   ========================================================= */
 
 function normalizeCount(
   value
@@ -4331,6 +4574,10 @@ function numberToWords(
 }
 
 
+/* =========================================================
+   PREVIEW
+   ========================================================= */
+
 function updatePreview(
   id
 ) {
@@ -4365,20 +4612,9 @@ function updatePreview(
 }
 
 
-function updateAllPreviews() {
-
-  trainees.forEach(
-    function(trainee) {
-
-      updatePreview(
-        trainee.id
-      );
-
-    }
-  );
-
-}
-
+/* =========================================================
+   COPY
+   ========================================================= */
 
 function copyFeedback(
   id
@@ -4393,13 +4629,13 @@ function copyFeedback(
   }
 
 
-  const text =
-    generateFeedback(
+  const currentParts =
+    getFeedbackParts(
       trainee
     );
 
 
-  if (!text.trim()) {
+  if (!currentParts.length) {
 
     showToast(
       "There is no feedback to copy."
@@ -4410,8 +4646,36 @@ function copyFeedback(
   }
 
 
+  /*
+    Copying the feedback counts as
+    generating the final version again.
+
+    Therefore ONLY THIS trainee gets
+    a new order. Comments themselves
+    stay exactly the same.
+  */
+
+  regenerateFeedbackOrder(
+    trainee
+  );
+
+
+  saveData();
+
+
+  const text =
+    generateFeedback(
+      trainee
+    );
+
+
   copyText(
     text
+  );
+
+
+  updatePreview(
+    id
   );
 
 }
@@ -4428,6 +4692,34 @@ function copyAllFeedback() {
     return;
 
   }
+
+
+  /*
+    Regenerate order separately for
+    each trainee. Their comments remain
+    independent and unchanged.
+  */
+
+  trainees.forEach(
+    function(trainee) {
+
+      if (
+        getFeedbackParts(
+          trainee
+        ).length
+      ) {
+
+        regenerateFeedbackOrder(
+          trainee
+        );
+
+      }
+
+    }
+  );
+
+
+  saveData();
 
 
   const blocks =
@@ -4478,6 +4770,34 @@ function copyAllFeedback() {
     blocks.join(
       "\n\n"
     )
+  );
+
+
+  /*
+    Update currently visible previews
+    without creating any new random
+    comments.
+  */
+
+  trainees.forEach(
+    function(trainee) {
+
+      const preview =
+        document.getElementById(
+          "preview-" + trainee.id
+        );
+
+
+      if (preview) {
+
+        preview.textContent =
+          generateFeedback(
+            trainee
+          );
+
+      }
+
+    }
   );
 
 }
@@ -4584,6 +4904,10 @@ function fallbackCopy(
 }
 
 
+/* =========================================================
+   CLEAR TRAINEE
+   ========================================================= */
+
 function clearTrainee(
   id
 ) {
@@ -4633,6 +4957,10 @@ function clearTrainee(
 }
 
 
+/* =========================================================
+   REMOVE
+   ========================================================= */
+
 function removeTrainee(
   id
 ) {
@@ -4658,6 +4986,10 @@ function removeTrainee(
 
 }
 
+
+/* =========================================================
+   CLEAR ALL
+   ========================================================= */
 
 function clearAll() {
 
@@ -4692,6 +5024,10 @@ function clearAll() {
 }
 
 
+/* =========================================================
+   SAVE
+   ========================================================= */
+
 function saveData() {
 
   try {
@@ -4715,6 +5051,10 @@ function saveData() {
 }
 
 
+/* =========================================================
+   LOAD
+   ========================================================= */
+
 function loadData() {
 
   try {
@@ -4723,6 +5063,30 @@ function loadData() {
       localStorage.getItem(
         STORAGE_KEY
       );
+
+
+    /*
+      Compatibility with previous versions.
+    */
+
+    if (!saved) {
+
+      saved =
+        localStorage.getItem(
+          "trainee_feedback_builder_v10"
+        );
+
+    }
+
+
+    if (!saved) {
+
+      saved =
+        localStorage.getItem(
+          "trainee_feedback_builder_v9"
+        );
+
+    }
 
 
     if (!saved) {
@@ -4832,62 +5196,96 @@ function loadData() {
 
 
           if (
-            trainee.camera &&
             trainee.randomComments &&
-            trainee.randomComments.camera
+            typeof trainee.randomComments ===
+            "object"
           ) {
 
-            randomComments.camera =
-              trainee.randomComments.camera;
+            if (
+              trainee.randomComments.camera
+            ) {
 
-          }
-
-
-          const savedCaseType =
-            Object.prototype.hasOwnProperty.call(
-              caseTypeComments,
-              trainee.caseType
-            )
-              ? trainee.caseType
-              : "";
-
-
-          if (
-            savedCaseType &&
-            trainee.randomComments &&
-            trainee.randomComments.caseType
-          ) {
-
-            randomComments.caseType =
-              trainee.randomComments.caseType;
-
-          }
-
-
-          feedbackQuestions.forEach(
-            function(question) {
-
-              if (
-                answers[
-                  question.key
-                ] &&
-                trainee.randomComments &&
-                trainee.randomComments[
-                  question.key
-                ]
-              ) {
-
-                randomComments[
-                  question.key
-                ] =
-                  trainee.randomComments[
-                    question.key
-                  ];
-
-              }
+              randomComments.camera =
+                trainee.randomComments.camera;
 
             }
-          );
+
+
+            if (
+              trainee.randomComments.caseType
+            ) {
+
+              randomComments.caseType =
+                trainee.randomComments.caseType;
+
+            }
+
+
+            feedbackQuestions.forEach(
+              function(question) {
+
+                if (
+                  trainee.randomComments[
+                    question.key
+                  ]
+                ) {
+
+                  randomComments[
+                    question.key
+                  ] =
+                    trainee.randomComments[
+                      question.key
+                    ];
+
+                }
+
+              }
+            );
+
+
+            if (
+              trainee.randomComments[
+                "understandingProgress"
+              ]
+            ) {
+
+              randomComments[
+                "understandingProgress"
+              ] =
+                trainee.randomComments[
+                  "understandingProgress"
+                ];
+
+            }
+
+          }
+
+
+          /*
+            Per-trainee random history.
+          */
+
+          const randomHistory =
+            trainee.randomHistory &&
+            typeof trainee.randomHistory ===
+            "object"
+              ? trainee.randomHistory
+              : {};
+
+
+          /*
+            Per-trainee feedback order.
+
+            Old versions did not have this,
+            so an empty array is used.
+          */
+
+          let feedbackOrder =
+            Array.isArray(
+              trainee.feedbackOrder
+            )
+              ? trainee.feedbackOrder
+              : [];
 
 
           let understandingProgress =
@@ -4895,17 +5293,19 @@ function loadData() {
             "";
 
 
-          if (
-            understandingProgress !==
-            "good_performance" &&
-            understandingProgress !==
-            "select_cases" &&
-            understandingProgress !==
-            "improved" &&
-            understandingProgress !==
-            "bad_performance" &&
-            understandingProgress !==
+          const validProgressValues = [
+            "good_performance",
+            "select_cases",
+            "improved",
+            "bad_performance",
             "declined"
+          ];
+
+
+          if (
+            !validProgressValues.includes(
+              understandingProgress
+            )
           ) {
 
             understandingProgress =
@@ -4956,14 +5356,18 @@ function loadData() {
           }
 
 
+          const savedCaseType =
+            Object.prototype.hasOwnProperty.call(
+              caseTypeComments,
+              trainee.caseType
+            )
+              ? trainee.caseType
+              : "";
+
+
           let loadedCaseType =
             savedCaseType;
 
-
-          /*
-            Case Type is valid only when
-            Select Cases is selected.
-          */
 
           if (
             understandingProgress !==
@@ -4976,24 +5380,28 @@ function loadData() {
           }
 
 
-          if (
-            understandingProgress &&
-            understandingProgress !==
-            "select_cases" &&
-            trainee.randomComments &&
-            trainee.randomComments[
-              "understandingProgress"
-            ]
-          ) {
+          /*
+            Keep only valid random history
+            arrays.
+          */
 
-            randomComments[
-              "understandingProgress"
-            ] =
-              trainee.randomComments[
-                "understandingProgress"
-              ];
+          Object.keys(
+            randomHistory
+          ).forEach(
+            function(key) {
 
-          }
+              if (
+                !Array.isArray(
+                  randomHistory[key]
+                )
+              ) {
+
+                delete randomHistory[key];
+
+              }
+
+            }
+          );
 
 
           return {
@@ -5060,6 +5468,12 @@ function loadData() {
             randomComments:
               randomComments,
 
+            randomHistory:
+              randomHistory,
+
+            feedbackOrder:
+              feedbackOrder,
+
             understandingProgress:
               understandingProgress,
 
@@ -5068,13 +5482,20 @@ function loadData() {
               "",
 
             open:
-              false
+              Boolean(
+                trainee.open
+              )
 
           };
 
         }
       );
 
+
+    /*
+      Save immediately so old data gets
+      migrated to the new structure.
+    */
 
     saveData();
 
@@ -5092,6 +5513,10 @@ function loadData() {
 
 }
 
+
+/* =========================================================
+   ESCAPE
+   ========================================================= */
 
 function escapeHTML(
   value
@@ -5138,6 +5563,10 @@ function escapeAttribute(
 }
 
 
+/* =========================================================
+   TOAST
+   ========================================================= */
+
 let toastTimer =
   null;
 
@@ -5181,7 +5610,9 @@ function showToast(
 }
 
 
-loadRandomHistory();
+/* =========================================================
+   START
+   ========================================================= */
 
 loadData();
 
