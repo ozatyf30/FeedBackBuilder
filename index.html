@@ -4116,20 +4116,7 @@ function getFeedbackParts(
   }
 
 
-  /*
-    CUSTOM COMMENT
-  */
-
-  if (
-    trainee.custom &&
-    trainee.custom.trim()
-  ) {
-
-    parts.push(
-      trainee.custom.trim()
-    );
-
-  }
+ 
 
 
   return parts;
@@ -4271,6 +4258,21 @@ function generateFeedback(
         }
       );
 
+/*
+  CUSTOM COMMENT
+  Always stays at the very end.
+*/
+
+if (
+  trainee.custom &&
+  trainee.custom.trim()
+) {
+
+  orderedParts.push(
+    trainee.custom.trim()
+  );
+
+}
 
   let result =
     pronoun +
