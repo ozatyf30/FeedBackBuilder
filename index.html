@@ -485,7 +485,7 @@
 
     .follow-up-buttons {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 7px;
     }
 
@@ -509,6 +509,52 @@
     }
 
     .follow-up-btn.selected.bad-trend {
+      background: #f2e5e5;
+      border-color: #d8b4b4;
+      color: #8a5555;
+    }
+
+    .case-type-section {
+      margin-top: 13px;
+      padding-top: 12px;
+      border-top: 1px solid #e2e8e4;
+    }
+
+    .case-type-title {
+      color: #586761;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 0 0 8px;
+      line-height: 1.45;
+    }
+
+    .case-type-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+    }
+
+    .case-type-btn {
+      min-height: 34px;
+      padding: 7px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #ffffff;
+      color: #53625b;
+      border-color: #d3ddd8;
+    }
+
+    .case-type-btn:hover {
+      background: #f4f7f5;
+    }
+
+    .case-type-btn.selected {
+      background: #e6eee9;
+      border-color: #abc5b3;
+      color: #365642;
+    }
+
+    .case-type-btn.selected.bad-case {
       background: #f2e5e5;
       border-color: #d8b4b4;
       color: #8a5555;
@@ -684,7 +730,11 @@
       }
 
       .follow-up-buttons {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
+      }
+
+      .case-type-grid {
+        grid-template-columns: repeat(4, 1fr);
       }
 
       .radio-option {
@@ -789,7 +839,7 @@
 
 <script>
 
- /* =========================================================
+/* =========================================================
      FEEDBACK DATABASE
 
      IMPORTANT:
@@ -857,7 +907,118 @@ const cameraComments = {
     "showed some periods with the camera turned off"
   ]
 };
-  const feedbackQuestions = [
+
+
+const caseTypeComments = {
+
+  PH: {
+    good: [
+      "handled physical cases confidently",
+      "showed good understanding of physical cases",
+      "performed well when handling physical cases"
+    ],
+    bad: [
+      "needed more support when handling physical cases",
+      "struggled with physical cases during the session",
+      "showed some difficulty handling physical cases"
+    ]
+  },
+
+  LO: {
+    good: [
+      "handled logical cases confidently",
+      "showed good understanding of logical cases",
+      "performed well when handling logical cases"
+    ],
+    bad: [
+      "needed more support when handling logical cases",
+      "struggled with logical cases during the session",
+      "showed some difficulty handling logical cases"
+    ]
+  },
+
+  NT: {
+    good: [
+      "handled non-technical cases confidently",
+      "showed good understanding of non-technical cases",
+      "performed well when handling non-technical cases"
+    ],
+    bad: [
+      "needed more support when handling non-technical cases",
+      "struggled with non-technical cases during the session",
+      "showed some difficulty handling non-technical cases"
+    ]
+  },
+
+  FH: {
+    good: [
+      "handled FTTH cases confidently",
+      "showed good understanding of FTTH cases",
+      "performed well when handling FTTH cases"
+    ],
+    bad: [
+      "needed more support when handling FTTH cases",
+      "struggled with FTTH cases during the session",
+      "showed some difficulty handling FTTH cases"
+    ]
+  },
+
+  Pr: {
+    good: [
+      "handled prepaid cases confidently",
+      "showed good understanding of prepaid cases",
+      "performed well when handling prepaid cases"
+    ],
+    bad: [
+      "needed more support when handling prepaid cases",
+      "struggled with prepaid cases during the session",
+      "showed some difficulty handling prepaid cases"
+    ]
+  },
+
+  Po: {
+    good: [
+      "handled postpaid cases confidently",
+      "showed good understanding of postpaid cases",
+      "performed well when handling postpaid cases"
+    ],
+    bad: [
+      "needed more support when handling postpaid cases",
+      "struggled with postpaid cases during the session",
+      "showed some difficulty handling postpaid cases"
+    ]
+  },
+
+  AC: {
+    good: [
+      "handled activation cases confidently",
+      "showed good understanding of activation cases",
+      "performed well when handling activation cases"
+    ],
+    bad: [
+      "needed more support when handling activation cases",
+      "struggled with activation cases during the session",
+      "showed some difficulty handling activation cases"
+    ]
+  }
+
+};
+
+
+const caseTypeLabels = {
+
+  PH: "PH — Physical Cases",
+  LO: "LO — Logical Cases",
+  NT: "NT — Non-Technical",
+  FH: "FH — FTTH Cases",
+  Pr: "Pr — Prepaid Cases",
+  Po: "Po — Postpaid Cases",
+  AC: "AC — Activation Cases"
+
+};
+
+
+ const feedbackQuestions = [
 
     {
       key: "understanding",
@@ -1372,1360 +1533,1303 @@ const cameraComments = {
      STORAGE
      ========================================================= */
 
-  const STORAGE_KEY =
-    "trainee_feedback_builder_v9";
 
-  const RANDOM_HISTORY_KEY =
-    "trainee_feedback_random_history_v3";
+const STORAGE_KEY =
+  "trainee_feedback_builder_v9";
 
-  let trainees = [];
+const RANDOM_HISTORY_KEY =
+  "trainee_feedback_random_history_v3";
 
-  let randomHistory = {};
+let trainees = [];
 
-
-  /* =========================================================
-     CREATE ID
-     ========================================================= */
-
-  function createId() {
-
-    return (
-      "t_" +
-      Date.now().toString(36) +
-      "_" +
-      Math.random()
-        .toString(36)
-        .substring(2, 9)
-    );
-
-  }
+let randomHistory = {};
 
 
-  /* =========================================================
-     FIND TRAINEE
-     ========================================================= */
+function createId() {
 
-  function findTrainee(id) {
+  return (
+    "t_" +
+    Date.now().toString(36) +
+    "_" +
+    Math.random()
+      .toString(36)
+      .substring(2, 9)
+  );
 
-    return trainees.find(
-      function(trainee) {
-        return trainee.id === id;
-      }
-    );
-
-  }
-
-
-  /* =========================================================
-     FIND QUESTION
-     ========================================================= */
-
-  function findQuestion(key) {
-
-    return feedbackQuestions.find(
-      function(question) {
-        return question.key === key;
-      }
-    ) || null;
-
-  }
+}
 
 
-  /* =========================================================
-     LOAD RANDOM HISTORY
-     ========================================================= */
+function findTrainee(id) {
 
-  function loadRandomHistory() {
+  return trainees.find(
+    function(trainee) {
+      return trainee.id === id;
+    }
+  );
 
-    try {
+}
 
-      const saved =
-        localStorage.getItem(
-          RANDOM_HISTORY_KEY
-        );
 
-      if (!saved) {
+function findQuestion(key) {
 
-        randomHistory = {};
+  return feedbackQuestions.find(
+    function(question) {
+      return question.key === key;
+    }
+  ) || null;
 
-        return;
+}
 
-      }
 
-      const parsed =
-        JSON.parse(saved);
+function loadRandomHistory() {
 
-      randomHistory =
-        parsed &&
-        typeof parsed === "object"
-          ? parsed
-          : {};
+  try {
 
-    } catch (error) {
+    const saved =
+      localStorage.getItem(
+        RANDOM_HISTORY_KEY
+      );
+
+    if (!saved) {
 
       randomHistory = {};
 
-    }
-
-  }
-
-
-  /* =========================================================
-     SAVE RANDOM HISTORY
-     ========================================================= */
-
-  function saveRandomHistory() {
-
-    try {
-
-      localStorage.setItem(
-        RANDOM_HISTORY_KEY,
-        JSON.stringify(
-          randomHistory
-        )
-      );
-
-    } catch (error) {
-
-      console.error(
-        "Could not save random history:",
-        error
-      );
+      return;
 
     }
 
+    const parsed =
+      JSON.parse(saved);
+
+    randomHistory =
+      parsed &&
+      typeof parsed === "object"
+        ? parsed
+        : {};
+
+  } catch (error) {
+
+    randomHistory = {};
+
   }
 
+}
 
-  /* =========================================================
-     RANDOM FROM ARRAY
-     ========================================================= */
 
-  function getRandomFromPool(
-    historyKey,
-    comments,
-    previousComment
+function saveRandomHistory() {
+
+  try {
+
+    localStorage.setItem(
+      RANDOM_HISTORY_KEY,
+      JSON.stringify(
+        randomHistory
+      )
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Could not save random history:",
+      error
+    );
+
+  }
+
+}
+
+
+function getRandomFromPool(
+  historyKey,
+  comments,
+  previousComment
+) {
+
+  if (
+    !Array.isArray(comments) ||
+    !comments.length
   ) {
 
-    if (
-      !Array.isArray(comments) ||
-      !comments.length
-    ) {
+    return "";
 
-      return "";
-
-    }
+  }
 
 
-    if (
-      !randomHistory[historyKey] ||
-      !Array.isArray(
-        randomHistory[historyKey]
+  if (
+    !randomHistory[historyKey] ||
+    !Array.isArray(
+      randomHistory[historyKey]
+    )
+  ) {
+
+    randomHistory[historyKey] = [];
+
+  }
+
+
+  let history =
+    randomHistory[historyKey];
+
+
+  history =
+    history.filter(
+      function(index) {
+
+        return (
+          Number.isInteger(index) &&
+          index >= 0 &&
+          index < comments.length
+        );
+
+      }
+    );
+
+
+  if (
+    history.length >= comments.length
+  ) {
+
+    history = [];
+
+  }
+
+
+  let available =
+    comments
+      .map(
+        function(_, index) {
+          return index;
+        }
       )
-    ) {
-
-      randomHistory[historyKey] = [];
-
-    }
-
-
-    let history =
-      randomHistory[historyKey];
-
-
-    history =
-      history.filter(
+      .filter(
         function(index) {
 
-          return (
-            Number.isInteger(index) &&
-            index >= 0 &&
-            index < comments.length
+          return !history.includes(
+            index
           );
 
         }
       );
 
 
-    if (
-      history.length >= comments.length
-    ) {
+  if (
+    previousComment &&
+    available.length > 1
+  ) {
 
-      history = [];
+    const filtered =
+      available.filter(
+        function(index) {
 
-    }
+          return (
+            comments[index] !==
+            previousComment
+          );
 
+        }
+      );
 
-    let available =
-      comments
-        .map(
-          function(_, index) {
-            return index;
-          }
-        )
-        .filter(
-          function(index) {
-
-            return !history.includes(
-              index
-            );
-
-          }
-        );
-
-
-    if (
-      previousComment &&
-      available.length > 1
-    ) {
-
-      const filtered =
-        available.filter(
-          function(index) {
-
-            return (
-              comments[index] !==
-              previousComment
-            );
-
-          }
-        );
-
-      if (filtered.length) {
-
-        available =
-          filtered;
-
-      }
-
-    }
-
-
-    if (!available.length) {
+    if (filtered.length) {
 
       available =
-        comments.map(
-          function(_, index) {
-            return index;
-          }
-        );
+        filtered;
 
     }
 
-
-    const randomIndex =
-      available[
-        Math.floor(
-          Math.random() *
-          available.length
-        )
-      ];
+  }
 
 
-    history.push(
-      randomIndex
-    );
+  if (!available.length) {
+
+    available =
+      comments.map(
+        function(_, index) {
+          return index;
+        }
+      );
+
+  }
 
 
-    randomHistory[historyKey] =
-      history;
+  const randomIndex =
+    available[
+      Math.floor(
+        Math.random() *
+        available.length
+      )
+    ];
 
 
-    saveRandomHistory();
+  history.push(
+    randomIndex
+  );
 
 
-    return comments[
-      randomIndex
+  randomHistory[historyKey] =
+    history;
+
+
+  saveRandomHistory();
+
+
+  return comments[
+    randomIndex
+  ];
+
+}
+
+
+function shuffleArray(array) {
+
+  const shuffled =
+    [...array];
+
+
+  for (
+    let i = shuffled.length - 1;
+    i > 0;
+    i--
+  ) {
+
+    const j =
+      Math.floor(
+        Math.random() *
+        (i + 1)
+      );
+
+
+    [
+      shuffled[i],
+      shuffled[j]
+    ] = [
+      shuffled[j],
+      shuffled[i]
     ];
 
   }
 
 
-  /* =========================================================
-     SHUFFLE ARRAY
-     ========================================================= */
+  return shuffled;
 
-  function shuffleArray(array) {
-
-    const shuffled =
-      [...array];
+}
 
 
-    for (
-      let i = shuffled.length - 1;
-      i > 0;
-      i--
-    ) {
+function getRandomComment(
+  questionKey,
+  type,
+  previousComment
+) {
 
-      const j =
-        Math.floor(
-          Math.random() *
-          (i + 1)
-        );
-
-
-      [
-        shuffled[i],
-        shuffled[j]
-      ] = [
-        shuffled[j],
-        shuffled[i]
-      ];
-
-    }
-
-
-    return shuffled;
-
-  }
-
-
-  /* =========================================================
-     GET RANDOM COMMENT
-     ========================================================= */
-
-  function getRandomComment(
-    questionKey,
-    type,
-    previousComment
-  ) {
-
-    const question =
-      findQuestion(
-        questionKey
-      );
-
-
-    if (!question) {
-      return "";
-    }
-
-
-    const comments =
-      type === "good"
-        ? question.good
-        : question.bad;
-
-
-    return getRandomFromPool(
-      questionKey + "_" + type,
-      comments,
-      previousComment
+  const question =
+    findQuestion(
+      questionKey
     );
 
+
+  if (!question) {
+    return "";
   }
 
 
-  /* =========================================================
-     GET RANDOM PERFORMANCE COMMENT
-     ========================================================= */
+  const comments =
+    type === "good"
+      ? question.good
+      : question.bad;
 
-  function getRandomPerformanceComment(
-    understandingAnswer,
-    progress,
+
+  return getRandomFromPool(
+    questionKey + "_" + type,
+    comments,
     previousComment
+  );
+
+}
+
+
+function getRandomPerformanceComment(
+  understandingAnswer,
+  progress,
+  previousComment
+) {
+
+  if (progress === "select_cases") {
+    return "";
+  }
+
+
+  const question =
+    findQuestion(
+      "understanding"
+    );
+
+
+  if (
+    !question ||
+    !question.performance
   ) {
 
-    const question =
-      findQuestion(
-        "understanding"
-      );
+    return "";
+
+  }
 
 
-    if (
-      !question ||
-      !question.performance
-    ) {
-
-      return "";
-
-    }
+  const side =
+    understandingAnswer === "good"
+      ? question.performance.good
+      : question.performance.bad;
 
 
-    const side =
-      understandingAnswer === "good"
-        ? question.performance.good
-        : question.performance.bad;
+  if (
+    !side ||
+    !Array.isArray(
+      side[progress]
+    )
+  ) {
+
+    return "";
+
+  }
 
 
-    if (
-      !side ||
-      !Array.isArray(
-        side[progress]
+  const historyKey =
+    "understanding_performance_" +
+    understandingAnswer +
+    "_" +
+    progress;
+
+
+  return getRandomFromPool(
+    historyKey,
+    side[progress],
+    previousComment
+  );
+
+}
+
+
+function createTrainee(name) {
+
+  return {
+
+    id:
+      createId(),
+
+    name:
+      name,
+
+    gender:
+      "He",
+
+    finalQuiz:
+      "Passed",
+
+    dailyQuiz:
+      "Completed all daily quizzes successfully",
+
+    tardyEnabled:
+      false,
+
+    tardyCount:
+      1,
+
+    absentEnabled:
+      false,
+
+    absentCount:
+      1,
+
+    camera:
+      "",
+
+    caseType:
+      "",
+
+    answers:
+      {},
+
+    randomComments:
+      {},
+
+    understandingProgress:
+      "",
+
+    custom:
+      "",
+
+    open:
+      false
+
+  };
+
+}
+
+
+function addTrainees() {
+
+  const textarea =
+    document.getElementById(
+      "traineeNames"
+    );
+
+
+  const names =
+    textarea.value
+      .split("\n")
+      .map(
+        function(name) {
+          return name.trim();
+        }
       )
-    ) {
-
-      return "";
-
-    }
-
-
-    const historyKey =
-      "understanding_performance_" +
-      understandingAnswer +
-      "_" +
-      progress;
+      .filter(
+        function(name) {
+          return name.length > 0;
+        }
+      );
 
 
-    return getRandomFromPool(
-      historyKey,
-      side[progress],
-      previousComment
+  if (!names.length) {
+
+    showToast(
+      "Please enter at least one trainee name."
     );
 
-  }
-
-
-  /* =========================================================
-     CREATE TRAINEE
-     ========================================================= */
-
-  function createTrainee(name) {
-
-    return {
-
-      id:
-        createId(),
-
-      name:
-        name,
-
-      gender:
-        "He",
-
-      finalQuiz:
-        "Passed",
-
-      dailyQuiz:
-        "Completed all daily quizzes successfully",
-
-      tardyEnabled:
-        false,
-
-      tardyCount:
-        1,
-
-      absentEnabled:
-        false,
-
-      absentCount:
-        1,
-
-      camera:
-        "",
-
-      answers:
-        {},
-
-      randomComments:
-        {},
-
-      understandingProgress:
-        "",
-
-      custom:
-        "",
-
-      open:
-        false
-
-    };
+    return;
 
   }
 
 
-  /* =========================================================
-     ADD TRAINEES
-     ========================================================= */
+  names.forEach(
+    function(name) {
 
-  function addTrainees() {
-
-    const textarea =
-      document.getElementById(
-        "traineeNames"
+      trainees.push(
+        createTrainee(name)
       );
-
-
-    const names =
-      textarea.value
-        .split("\n")
-        .map(
-          function(name) {
-            return name.trim();
-          }
-        )
-        .filter(
-          function(name) {
-            return name.length > 0;
-          }
-        );
-
-
-    if (!names.length) {
-
-      showToast(
-        "Please enter at least one trainee name."
-      );
-
-      return;
 
     }
+  );
 
 
-    names.forEach(
-      function(name) {
+  textarea.value = "";
 
-        trainees.push(
-          createTrainee(name)
-        );
+  saveData();
+
+  render();
+
+
+  showToast(
+    names.length +
+    " trainee(s) added."
+  );
+
+}
+
+
+function render() {
+
+  const list =
+    document.getElementById(
+      "traineeList"
+    );
+
+
+  const count =
+    document.getElementById(
+      "traineeCount"
+    );
+
+
+  const search =
+    document
+      .getElementById(
+        "globalSearch"
+      )
+      .value
+      .toLowerCase()
+      .trim();
+
+
+  const filtered =
+    trainees.filter(
+      function(trainee) {
+
+        if (!search) {
+          return true;
+        }
+
+        return trainee.name
+          .toLowerCase()
+          .includes(search);
 
       }
     );
 
 
-    textarea.value = "";
-
-    saveData();
-
-    render();
-
-
-    showToast(
-      names.length +
-      " trainee(s) added."
+  count.textContent =
+    trainees.length +
+    (
+      trainees.length === 1
+        ? " trainee"
+        : " trainees"
     );
 
-  }
 
+  if (!filtered.length) {
 
-  /* =========================================================
-     RENDER
-     ========================================================= */
+    list.innerHTML = `
 
-  function render() {
+      <div class="empty">
 
-    const list =
-      document.getElementById(
-        "traineeList"
-      );
-
-
-    const count =
-      document.getElementById(
-        "traineeCount"
-      );
-
-
-    const search =
-      document
-        .getElementById(
-          "globalSearch"
-        )
-        .value
-        .toLowerCase()
-        .trim();
-
-
-    const filtered =
-      trainees.filter(
-        function(trainee) {
-
-          if (!search) {
-            return true;
-          }
-
-          return trainee.name
-            .toLowerCase()
-            .includes(search);
-
+        ${
+          trainees.length
+            ? "No trainees match your search."
+            : "No trainees added yet."
         }
-      );
-
-
-    count.textContent =
-      trainees.length +
-      (
-        trainees.length === 1
-          ? " trainee"
-          : " trainees"
-      );
-
-
-    if (!filtered.length) {
-
-      list.innerHTML = `
-
-        <div class="empty">
-
-          ${
-            trainees.length
-              ? "No trainees match your search."
-              : "No trainees added yet."
-          }
-
-        </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    list.innerHTML =
-      filtered
-        .map(
-          function(trainee, index) {
-
-            return createTraineeHTML(
-              trainee,
-              index
-            );
-
-          }
-        )
-        .join("");
-
-  }
-
-
-  /* =========================================================
-     TRAINEE HTML
-     ========================================================= */
-
-  function createTraineeHTML(
-    trainee,
-    index
-  ) {
-
-    return `
-
-      <div
-        class="trainee-card ${
-          trainee.open
-            ? "open"
-            : ""
-        }"
-        id="card-${escapeHTML(
-          trainee.id
-        )}"
-      >
-
-        <div class="trainee-header">
-
-          <button
-            class="trainee-toggle"
-            onclick="toggleTrainee(
-              '${trainee.id}'
-            )"
-            type="button"
-          >
-
-            <span class="trainee-arrow">
-
-              ${
-                trainee.open
-                  ? "▼"
-                  : "▶"
-              }
-
-            </span>
-
-            <span class="trainee-name-title">
-
-              ${
-                escapeHTML(
-                  trainee.name ||
-                  "Unnamed Trainee"
-                )
-              }
-
-            </span>
-
-          </button>
-
-
-          <button
-            class="remove-trainee-btn"
-            onclick="removeTrainee(
-              '${trainee.id}'
-            )"
-            type="button"
-          >
-            Remove Trainee
-          </button>
-
-        </div>
-
-
-        <div class="trainee-body">
-
-
-          <!-- BASIC INFORMATION -->
-
-          <div class="grid">
-
-
-            <div class="field name-field">
-
-              <label>
-                Trainee Name
-              </label>
-
-              <input
-                class="name-input"
-                type="text"
-                value="${escapeAttribute(
-                  trainee.name
-                )}"
-                oninput="updateName(
-                  '${trainee.id}',
-                  this.value
-                )"
-              >
-
-            </div>
-
-
-            <div class="field">
-
-              <label>
-                Gender
-              </label>
-
-              <select
-                onchange="updateField(
-                  '${trainee.id}',
-                  'gender',
-                  this.value
-                )"
-              >
-
-                <option
-                  value="He"
-                  ${
-                    trainee.gender === "He"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  He
-                </option>
-
-                <option
-                  value="She"
-                  ${
-                    trainee.gender === "She"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  She
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <div class="field">
-
-              <label>
-                Final Quiz
-              </label>
-
-              <select
-                onchange="updateField(
-                  '${trainee.id}',
-                  'finalQuiz',
-                  this.value
-                )"
-              >
-
-                <option
-                  value="Passed"
-                  ${
-                    trainee.finalQuiz ===
-                    "Passed"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  Passed
-                </option>
-
-                <option
-                  value="Did not pass"
-                  ${
-                    trainee.finalQuiz ===
-                    "Did not pass"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  Did not pass
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <div class="field">
-
-              <label>
-                Daily Quizzes
-              </label>
-
-              <select
-                onchange="updateField(
-                  '${trainee.id}',
-                  'dailyQuiz',
-                  this.value
-                )"
-              >
-
-                <option
-                  value="Completed all daily quizzes successfully"
-                  ${
-                    trainee.dailyQuiz ===
-                    "Completed all daily quizzes successfully"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  Completed all daily quizzes successfully
-                </option>
-
-                <option
-                  value="missed daily quizzes, coaching was provided"
-                  ${
-                    trainee.dailyQuiz ===
-                    "missed daily quizzes, coaching was provided"
-                      ? "selected"
-                      : ""
-                  }
-                >
-                  Missed daily quizzes, coaching was provided
-                </option>
-
-              </select>
-
-            </div>
-
-          </div>
-
-
-          <!-- CAMERA -->
-
-          <div class="camera-section">
-
-            <div class="section-title">
-              Camera
-            </div>
-
-            <div class="radio-options">
-
-              <label
-                class="radio-option ${
-                  trainee.camera === "always"
-                    ? "selected"
-                    : ""
-                }"
-              >
-
-                <input
-                  type="radio"
-                  name="camera-${escapeAttribute(
-                    trainee.id
-                  )}"
-                  value="always"
-                  ${
-                    trainee.camera === "always"
-                      ? "checked"
-                      : ""
-                  }
-                  onchange="setCamera(
-                    '${trainee.id}',
-                    'always'
-                  )"
-                >
-
-                Always On
-
-              </label>
-
-
-              <label
-                class="radio-option ${
-                  trainee.camera === "sometimes_off"
-                    ? "selected"
-                    : ""
-                }"
-              >
-
-                <input
-                  type="radio"
-                  name="camera-${escapeAttribute(
-                    trainee.id
-                  )}"
-                  value="sometimes_off"
-                  ${
-                    trainee.camera === "sometimes_off"
-                      ? "checked"
-                      : ""
-                  }
-                  onchange="setCamera(
-                    '${trainee.id}',
-                    'sometimes_off'
-                  )"
-                >
-
-                Sometimes Off
-
-              </label>
-
-            </div>
-
-          </div>
-
-
-          <!-- ATTENDANCE -->
-
-          <div class="attendance-section">
-
-            <div class="section-title">
-              Attendance & Commitment
-            </div>
-
-
-            <div class="attendance-grid">
-
-
-              <!-- TARDY -->
-
-              <div
-                class="attendance-item ${
-                  trainee.tardyEnabled
-                    ? ""
-                    : "disabled"
-                }"
-              >
-
-                <div class="attendance-top">
-
-                  <input
-                    id="tardy-${escapeAttribute(
-                      trainee.id
-                    )}"
-                    type="checkbox"
-                    ${
-                      trainee.tardyEnabled
-                        ? "checked"
-                        : ""
-                    }
-                    onchange="toggleAttendance(
-                      '${trainee.id}',
-                      'tardyEnabled',
-                      this.checked
-                    )"
-                  >
-
-                  <label
-                    for="tardy-${escapeAttribute(
-                      trainee.id
-                    )}"
-                  >
-                    Tardy
-                  </label>
-
-                </div>
-
-
-                <div class="attendance-controls">
-
-                  <input
-                    class="number-input"
-                    type="number"
-                    min="1"
-                    max="999"
-                    value="${normalizeCount(
-                      trainee.tardyCount
-                    )}"
-                    ${
-                      trainee.tardyEnabled
-                        ? ""
-                        : "disabled"
-                    }
-                    onchange="updateAttendanceCount(
-                      '${trainee.id}',
-                      'tardyCount',
-                      this.value
-                    )"
-                  >
-
-                  <div
-                    class="attendance-word"
-                    id="tardy-word-${escapeAttribute(
-                      trainee.id
-                    )}"
-                  >
-
-                    ${
-                      trainee.tardyEnabled
-                        ? numberToWords(
-                            normalizeCount(
-                              trainee.tardyCount
-                            )
-                          )
-                        : ""
-                    }
-
-                  </div>
-
-                </div>
-
-              </div>
-
-
-              <!-- ABSENT -->
-
-              <div
-                class="attendance-item ${
-                  trainee.absentEnabled
-                    ? ""
-                    : "disabled"
-                }"
-              >
-
-                <div class="attendance-top">
-
-                  <input
-                    id="absent-${escapeAttribute(
-                      trainee.id
-                    )}"
-                    type="checkbox"
-                    ${
-                      trainee.absentEnabled
-                        ? "checked"
-                        : ""
-                    }
-                    onchange="toggleAttendance(
-                      '${trainee.id}',
-                      'absentEnabled',
-                      this.checked
-                    )"
-                  >
-
-                  <label
-                    for="absent-${escapeAttribute(
-                      trainee.id
-                    )}"
-                  >
-                    Absent
-                  </label>
-
-                </div>
-
-
-                <div class="attendance-controls">
-
-                  <input
-                    class="number-input"
-                    type="number"
-                    min="1"
-                    max="999"
-                    value="${normalizeCount(
-                      trainee.absentCount
-                    )}"
-                    ${
-                      trainee.absentEnabled
-                        ? ""
-                        : "disabled"
-                    }
-                    onchange="updateAttendanceCount(
-                      '${trainee.id}',
-                      'absentCount',
-                      this.value
-                    )"
-                  >
-
-                  <div
-                    class="attendance-word"
-                    id="absent-word-${escapeAttribute(
-                      trainee.id
-                    )}"
-                  >
-
-                    ${
-                      trainee.absentEnabled
-                        ? numberToWords(
-                            normalizeCount(
-                              trainee.absentCount
-                            )
-                          )
-                        : ""
-                    }
-
-                  </div>
-
-                </div>
-
-              </div>
-
-
-            </div>
-
-          </div>
-
-
-          <!-- FEEDBACK QUESTIONS -->
-
-          <div class="feedback-section">
-
-            <div class="section-title">
-              Training Feedback
-            </div>
-
-
-            <div class="feedback-intro">
-              Answer each question based on the trainee's performance.
-              The system will automatically select a suitable comment.
-            </div>
-
-
-            <div class="question-list">
-
-              ${renderFeedbackQuestions(
-                trainee
-              )}
-
-            </div>
-
-          </div>
-
-
-          <!-- CUSTOM COMMENT -->
-
-          <div class="custom-section">
-
-            <label
-              for="custom-${escapeAttribute(
-                trainee.id
-              )}"
-            >
-              Custom Comment
-            </label>
-
-            <textarea
-              id="custom-${escapeAttribute(
-                trainee.id
-              )}"
-              placeholder="Write an additional comment..."
-              oninput="updateCustom(
-                '${trainee.id}',
-                this.value
-              )"
-            >${escapeHTML(
-              trainee.custom
-            )}</textarea>
-
-          </div>
-
-
-          <!-- PREVIEW -->
-
-          <div class="preview-section">
-
-            <div class="section-title">
-              Feedback Preview
-            </div>
-
-            <div
-              class="preview-box"
-              id="preview-${escapeAttribute(
-                trainee.id
-              )}"
-            >
-
-              ${escapeHTML(
-                generateFeedback(
-                  trainee
-                )
-              )}
-
-            </div>
-
-          </div>
-
-
-          <!-- ACTIONS -->
-
-          <div class="card-actions">
-
-            <button
-              class="primary"
-              onclick="copyFeedback(
-                '${trainee.id}'
-              )"
-              type="button"
-            >
-              Copy Feedback
-            </button>
-
-
-            <button
-              onclick="clearTrainee(
-                '${trainee.id}'
-              )"
-              type="button"
-            >
-              Clear
-            </button>
-
-          </div>
-
-
-        </div>
 
       </div>
 
     `;
 
+    return;
+
   }
 
 
-  /* =========================================================
-     RENDER FEEDBACK QUESTIONS
-     ========================================================= */
-
-  function renderFeedbackQuestions(
-    trainee
-  ) {
-
-    return feedbackQuestions
+  list.innerHTML =
+    filtered
       .map(
-        function(question) {
+        function(trainee, index) {
 
-          const answer =
-            trainee.answers &&
-            trainee.answers[
-              question.key
-            ]
-              ? trainee.answers[
-                  question.key
-                ]
-              : "";
+          return createTraineeHTML(
+            trainee,
+            index
+          );
 
+        }
+      )
+      .join("");
 
-          let stateText = "";
+}
 
 
-          if (answer === "good") {
+function createTraineeHTML(
+  trainee,
+  index
+) {
 
-            stateText =
-              "Good selected";
+  return `
 
-          } else if (answer === "bad") {
+    <div
+      class="trainee-card ${
+        trainee.open
+          ? "open"
+          : ""
+      }"
+      id="card-${escapeHTML(
+        trainee.id
+      )}"
+    >
 
-            stateText =
-              "Needs improvement selected";
+      <div class="trainee-header">
 
-          }
+        <button
+          class="trainee-toggle"
+          onclick="toggleTrainee(
+            '${trainee.id}'
+          )"
+          type="button"
+        >
 
+          <span class="trainee-arrow">
 
-          let followUpHTML = "";
+            ${
+              trainee.open
+                ? "▼"
+                : "▶"
+            }
 
+          </span>
 
-          if (
-            question.key === "understanding" &&
-            answer
-          ) {
+          <span class="trainee-name-title">
 
-            const progress =
-              trainee.understandingProgress ||
-              "";
+            ${
+              escapeHTML(
+                trainee.name ||
+                "Unnamed Trainee"
+              )
+            }
 
+          </span>
 
-            const firstLabel =
-              answer === "good"
-                ? "Good Performance"
-                : "Bad Performance";
-
-
-            const secondLabel =
-              answer === "good"
-                ? "Started weak and improved"
-                : "Started good and declined";
-
-
-            const firstValue =
-              answer === "good"
-                ? "good_performance"
-                : "bad_performance";
+        </button>
 
 
-            const secondValue =
-              answer === "good"
-                ? "improved"
-                : "declined";
+        <button
+          class="remove-trainee-btn"
+          onclick="removeTrainee(
+            '${trainee.id}'
+          )"
+          type="button"
+        >
+          Remove Trainee
+        </button>
+
+      </div>
 
 
-            followUpHTML = `
+      <div class="trainee-body">
 
-              <div class="follow-up">
 
-                <div class="follow-up-title">
-                  How was the trainee's performance throughout the training?
+        <div class="grid">
+
+
+          <div class="field name-field">
+
+            <label>
+              Trainee Name
+            </label>
+
+            <input
+              class="name-input"
+              type="text"
+              value="${escapeAttribute(
+                trainee.name
+              )}"
+              oninput="updateName(
+                '${trainee.id}',
+                this.value
+              )"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Gender
+            </label>
+
+            <select
+              onchange="updateField(
+                '${trainee.id}',
+                'gender',
+                this.value
+              )"
+            >
+
+              <option
+                value="He"
+                ${
+                  trainee.gender === "He"
+                    ? "selected"
+                    : ""
+                }
+              >
+                He
+              </option>
+
+              <option
+                value="She"
+                ${
+                  trainee.gender === "She"
+                    ? "selected"
+                    : ""
+                }
+              >
+                She
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Final Quiz
+            </label>
+
+            <select
+              onchange="updateField(
+                '${trainee.id}',
+                'finalQuiz',
+                this.value
+              )"
+            >
+
+              <option
+                value="Passed"
+                ${
+                  trainee.finalQuiz ===
+                  "Passed"
+                    ? "selected"
+                    : ""
+                }
+              >
+                Passed
+              </option>
+
+              <option
+                value="Did not pass"
+                ${
+                  trainee.finalQuiz ===
+                  "Did not pass"
+                    ? "selected"
+                    : ""
+                }
+              >
+                Did not pass
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Daily Quizzes
+            </label>
+
+            <select
+              onchange="updateField(
+                '${trainee.id}',
+                'dailyQuiz',
+                this.value
+              )"
+            >
+
+              <option
+                value="Completed all daily quizzes successfully"
+                ${
+                  trainee.dailyQuiz ===
+                  "Completed all daily quizzes successfully"
+                    ? "selected"
+                    : ""
+                }
+              >
+                Completed all daily quizzes successfully
+              </option>
+
+              <option
+                value="missed daily quizzes, coaching was provided"
+                ${
+                  trainee.dailyQuiz ===
+                  "missed daily quizzes, coaching was provided"
+                    ? "selected"
+                    : ""
+                }
+              >
+                Missed daily quizzes, coaching was provided
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <div class="camera-section">
+
+          <div class="section-title">
+            Camera — الكاميرا
+          </div>
+
+          <div class="radio-options">
+
+            <label
+              class="radio-option ${
+                trainee.camera === "always"
+                  ? "selected"
+                  : ""
+              }"
+            >
+
+              <input
+                type="radio"
+                name="camera-${escapeAttribute(
+                  trainee.id
+                )}"
+                value="always"
+                ${
+                  trainee.camera === "always"
+                    ? "checked"
+                    : ""
+                }
+                onchange="setCamera(
+                  '${trainee.id}',
+                  'always'
+                )"
+              >
+
+              Always On
+
+            </label>
+
+
+            <label
+              class="radio-option ${
+                trainee.camera === "sometimes_off"
+                  ? "selected"
+                  : ""
+              }"
+            >
+
+              <input
+                type="radio"
+                name="camera-${escapeAttribute(
+                  trainee.id
+                )}"
+                value="sometimes_off"
+                ${
+                  trainee.camera === "sometimes_off"
+                    ? "checked"
+                    : ""
+                }
+                onchange="setCamera(
+                  '${trainee.id}',
+                  'sometimes_off'
+                )"
+              >
+
+              Sometimes Off
+
+            </label>
+
+          </div>
+
+        </div>
+
+
+        <div class="attendance-section">
+
+          <div class="section-title">
+            Attendance & Commitment
+          </div>
+
+
+          <div class="attendance-grid">
+
+
+            <div
+              class="attendance-item ${
+                trainee.tardyEnabled
+                  ? ""
+                  : "disabled"
+              }"
+            >
+
+              <div class="attendance-top">
+
+                <input
+                  id="tardy-${escapeAttribute(
+                    trainee.id
+                  )}"
+                  type="checkbox"
+                  ${
+                    trainee.tardyEnabled
+                      ? "checked"
+                      : ""
+                  }
+                  onchange="toggleAttendance(
+                    '${trainee.id}',
+                    'tardyEnabled',
+                    this.checked
+                  )"
+                >
+
+                <label
+                  for="tardy-${escapeAttribute(
+                    trainee.id
+                  )}"
+                >
+                  Tardy
+                </label>
+
+              </div>
+
+
+              <div class="attendance-controls">
+
+                <input
+                  class="number-input"
+                  type="number"
+                  min="1"
+                  max="999"
+                  value="${normalizeCount(
+                    trainee.tardyCount
+                  )}"
+                  ${
+                    trainee.tardyEnabled
+                      ? ""
+                      : "disabled"
+                  }
+                  onchange="updateAttendanceCount(
+                    '${trainee.id}',
+                    'tardyCount',
+                    this.value
+                  )"
+                >
+
+                <div
+                  class="attendance-word"
+                  id="tardy-word-${escapeAttribute(
+                    trainee.id
+                  )}"
+                >
+
+                  ${
+                    trainee.tardyEnabled
+                      ? numberToWords(
+                          normalizeCount(
+                            trainee.tardyCount
+                          )
+                        )
+                      : ""
+                  }
+
                 </div>
 
+              </div>
 
-                <div class="follow-up-buttons">
+            </div>
 
-                  <button
-                    type="button"
-                    class="follow-up-btn ${
-                      progress === firstValue
-                        ? "selected" +
-                          (
-                            answer === "bad"
-                              ? " bad-trend"
-                              : ""
+
+            <div
+              class="attendance-item ${
+                trainee.absentEnabled
+                  ? ""
+                  : "disabled"
+              }"
+            >
+
+              <div class="attendance-top">
+
+                <input
+                  id="absent-${escapeAttribute(
+                    trainee.id
+                  )}"
+                  type="checkbox"
+                  ${
+                    trainee.absentEnabled
+                      ? "checked"
+                      : ""
+                  }
+                  onchange="toggleAttendance(
+                    '${trainee.id}',
+                    'absentEnabled',
+                    this.checked
+                  )"
+                >
+
+                <label
+                  for="absent-${escapeAttribute(
+                    trainee.id
+                  )}"
+                >
+                  Absent
+                </label>
+
+              </div>
+
+
+              <div class="attendance-controls">
+
+                <input
+                  class="number-input"
+                  type="number"
+                  min="1"
+                  max="999"
+                  value="${normalizeCount(
+                    trainee.absentCount
+                  )}"
+                  ${
+                    trainee.absentEnabled
+                      ? ""
+                      : "disabled"
+                  }
+                  onchange="updateAttendanceCount(
+                    '${trainee.id}',
+                    'absentCount',
+                    this.value
+                  )"
+                >
+
+                <div
+                  class="attendance-word"
+                  id="absent-word-${escapeAttribute(
+                    trainee.id
+                  )}"
+                >
+
+                  ${
+                    trainee.absentEnabled
+                      ? numberToWords(
+                          normalizeCount(
+                            trainee.absentCount
                           )
-                        : ""
-                    }"
-                    onclick="setUnderstandingProgress(
-                      '${trainee.id}',
-                      '${firstValue}'
-                    )"
-                  >
-                    ${escapeHTML(
-                      firstLabel
-                    )}
-                  </button>
+                        )
+                      : ""
+                  }
+
+                </div>
+
+              </div>
+
+            </div>
 
 
-                  <button
-                    type="button"
-                    class="follow-up-btn ${
-                      progress === secondValue
-                        ? "selected" +
-                          (
-                            answer === "bad"
-                              ? " bad-trend"
-                              : ""
-                          )
-                        : ""
-                    }"
-                    onclick="setUnderstandingProgress(
-                      '${trainee.id}',
-                      '${secondValue}'
-                    )"
-                  >
-                    ${escapeHTML(
-                      secondLabel
-                    )}
-                  </button>
+          </div>
+
+        </div>
+
+
+        <div class="feedback-section">
+
+          <div class="section-title">
+            Training Feedback
+          </div>
+
+
+          <div class="feedback-intro">
+            Answer each question based on the trainee's performance.
+            The system will automatically select a suitable comment.
+          </div>
+
+
+          <div class="question-list">
+
+            ${renderFeedbackQuestions(
+              trainee
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="custom-section">
+
+          <label
+            for="custom-${escapeAttribute(
+              trainee.id
+            )}"
+          >
+            Custom Comment
+          </label>
+
+          <textarea
+            id="custom-${escapeAttribute(
+              trainee.id
+            )}"
+            placeholder="Write an additional comment..."
+            oninput="updateCustom(
+              '${trainee.id}',
+              this.value
+            )"
+          >${escapeHTML(
+            trainee.custom
+          )}</textarea>
+
+        </div>
+
+
+        <div class="preview-section">
+
+          <div class="section-title">
+            Feedback Preview
+          </div>
+
+          <div
+            class="preview-box"
+            id="preview-${escapeAttribute(
+              trainee.id
+            )}"
+          >
+
+            ${escapeHTML(
+              generateFeedback(
+                trainee
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="card-actions">
+
+          <button
+            class="primary"
+            onclick="copyFeedback(
+              '${trainee.id}'
+            )"
+            type="button"
+          >
+            Copy Feedback
+          </button>
+
+
+          <button
+            onclick="clearTrainee(
+              '${trainee.id}'
+            )"
+            type="button"
+          >
+            Clear
+          </button>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+function renderFeedbackQuestions(
+  trainee
+) {
+
+  return feedbackQuestions
+    .map(
+      function(question) {
+
+        const answer =
+          trainee.answers &&
+          trainee.answers[
+            question.key
+          ]
+            ? trainee.answers[
+                question.key
+              ]
+            : "";
+
+
+        let stateText = "";
+
+
+        if (answer === "good") {
+
+          stateText =
+            "Good selected";
+
+        } else if (answer === "bad") {
+
+          stateText =
+            "Needs improvement selected";
+
+        }
+
+
+        let followUpHTML = "";
+
+
+        if (
+          question.key === "understanding" &&
+          answer
+        ) {
+
+          const progress =
+            trainee.understandingProgress ||
+            "";
+
+
+          const firstLabel =
+            answer === "good"
+              ? "Good Performance"
+              : "Bad Performance";
+
+
+          const secondLabel =
+            answer === "good"
+              ? "Started weak and improved"
+              : "Started good and declined";
+
+
+          const firstValue =
+            answer === "good"
+              ? "good_performance"
+              : "bad_performance";
+
+
+          const secondValue =
+            answer === "good"
+              ? "improved"
+              : "declined";
+
+
+          const caseTypeTitle =
+            answer === "good"
+              ? "What was the trainee good at? — In which case type did the trainee perform well?"
+              : "What did the trainee need improvement in? — Which case type did the trainee struggle with?";
+
+
+          let caseTypeHTML = "";
+
+
+          /*
+            Case Type appears ONLY when
+            Select Cases is selected.
+          */
+
+          if (
+            progress === "select_cases"
+          ) {
+
+            caseTypeHTML = `
+
+              <div class="case-type-section">
+
+                <div class="case-type-title">
+                  ${escapeHTML(
+                    caseTypeTitle
+                  )}
+                </div>
+
+                <div class="case-type-grid">
+
+                  ${Object.keys(caseTypeLabels)
+                    .map(
+                      function(key) {
+
+                        return `
+
+                          <button
+                            type="button"
+                            class="case-type-btn ${
+                              trainee.caseType === key
+                                ? "selected" +
+                                  (
+                                    answer === "bad"
+                                      ? " bad-case"
+                                      : ""
+                                  )
+                                : ""
+                            }"
+                            onclick="setCaseType(
+                              '${trainee.id}',
+                              '${key}'
+                            )"
+                          >
+                            ${escapeHTML(
+                              key
+                            )}
+                          </button>
+
+                        `;
+
+                      }
+                    )
+                    .join("")}
 
                 </div>
 
@@ -2736,133 +2840,497 @@ const cameraComments = {
           }
 
 
-          return `
+          followUpHTML = `
 
-            <div class="feedback-question">
+            <div class="follow-up">
 
-              <div class="question-text">
-
-                ${escapeHTML(
-                  question.question
-                )}
-
+              <div class="follow-up-title">
+                How was the trainee's performance throughout the training? — كيف كان أداء المتدرب طوال فترة التدريب؟
               </div>
 
 
-              <div class="answer-buttons">
+              <div class="follow-up-buttons">
 
                 <button
                   type="button"
-                  class="answer-btn good ${
-                    answer === "good"
-                      ? "selected"
+                  class="follow-up-btn ${
+                    progress === firstValue
+                      ? "selected" +
+                        (
+                          answer === "bad"
+                            ? " bad-trend"
+                            : ""
+                        )
                       : ""
                   }"
-                  onclick="setFeedbackAnswer(
+                  onclick="setUnderstandingProgress(
                     '${trainee.id}',
-                    '${question.key}',
-                    'good'
+                    '${firstValue}'
                   )"
                 >
-                  Good
+                  ${escapeHTML(
+                    firstLabel
+                  )}
                 </button>
 
 
                 <button
                   type="button"
-                  class="answer-btn bad ${
-                    answer === "bad"
-                      ? "selected"
+                  class="follow-up-btn ${
+                    progress === "select_cases"
+                      ? "selected" +
+                        (
+                          answer === "bad"
+                            ? " bad-trend"
+                            : ""
+                        )
                       : ""
                   }"
-                  onclick="setFeedbackAnswer(
+                  onclick="setUnderstandingProgress(
                     '${trainee.id}',
-                    '${question.key}',
-                    'bad'
+                    'select_cases'
                   )"
                 >
-                  Needs Improvement
+                  Select Cases
+                </button>
+
+
+                <button
+                  type="button"
+                  class="follow-up-btn ${
+                    progress === secondValue
+                      ? "selected" +
+                        (
+                          answer === "bad"
+                            ? " bad-trend"
+                            : ""
+                        )
+                      : ""
+                  }"
+                  onclick="setUnderstandingProgress(
+                    '${trainee.id}',
+                    '${secondValue}'
+                  )"
+                >
+                  ${escapeHTML(
+                    secondLabel
+                  )}
                 </button>
 
               </div>
 
 
-              <div class="answer-state">
-
-                ${escapeHTML(
-                  stateText
-                )}
-
-              </div>
-
-
-              ${followUpHTML}
+              ${caseTypeHTML}
 
             </div>
 
           `;
 
         }
-      )
-      .join("");
+
+
+        return `
+
+          <div class="feedback-question">
+
+            <div class="question-text">
+
+              ${escapeHTML(
+                question.question
+              )}
+
+            </div>
+
+
+            <div class="answer-buttons">
+
+              <button
+                type="button"
+                class="answer-btn good ${
+                  answer === "good"
+                    ? "selected"
+                    : ""
+                }"
+                onclick="setFeedbackAnswer(
+                  '${trainee.id}',
+                  '${question.key}',
+                  'good'
+                )"
+              >
+                Good
+              </button>
+
+
+              <button
+                type="button"
+                class="answer-btn bad ${
+                  answer === "bad"
+                    ? "selected"
+                    : ""
+                }"
+                onclick="setFeedbackAnswer(
+                  '${trainee.id}',
+                  '${question.key}',
+                  'bad'
+                )"
+              >
+                Needs Improvement
+              </button>
+
+            </div>
+
+
+            <div class="answer-state">
+
+              ${escapeHTML(
+                stateText
+              )}
+
+            </div>
+
+
+            ${followUpHTML}
+
+          </div>
+
+        `;
+
+      }
+    )
+    .join("");
+
+}
+
+
+function setCamera(
+  id,
+  value
+) {
+
+  const trainee =
+    findTrainee(id);
+
+  if (!trainee) {
+    return;
+  }
+
+  trainee.camera =
+    value;
+
+  delete trainee.randomComments.camera;
+
+  saveData();
+
+  renderCardBody(id);
+
+  updatePreview(id);
+
+}
+
+
+function setCaseType(
+  id,
+  value
+) {
+
+  const trainee =
+    findTrainee(id);
+
+  if (!trainee) {
+    return;
+  }
+
+
+  const understanding =
+    trainee.answers &&
+    trainee.answers.understanding;
+
+
+  if (
+    understanding !== "good" &&
+    understanding !== "bad"
+  ) {
+
+    return;
 
   }
 
 
-  /* =========================================================
-     SET CAMERA
-     ========================================================= */
-
-  function setCamera(
-    id,
-    value
+  if (
+    trainee.understandingProgress !==
+    "select_cases"
   ) {
 
-    const trainee =
-      findTrainee(id);
+    return;
 
-    if (!trainee) {
-      return;
+  }
+
+
+  trainee.caseType =
+    Object.prototype.hasOwnProperty.call(
+      caseTypeComments,
+      value
+    )
+      ? value
+      : "";
+
+
+  if (!trainee.randomComments) {
+
+    trainee.randomComments = {};
+
+  }
+
+
+  delete trainee.randomComments.caseType;
+
+
+  if (trainee.caseType) {
+
+    const pool =
+      caseTypeComments[
+        trainee.caseType
+      ][
+        understanding
+      ];
+
+
+    trainee.randomComments.caseType =
+      getRandomFromPool(
+        "caseType_" +
+        trainee.caseType +
+        "_" +
+        understanding,
+        pool,
+        null
+      );
+
+  }
+
+
+  saveData();
+
+  updateFeedbackUI(id);
+
+  updatePreview(id);
+
+}
+
+
+function setFeedbackAnswer(
+  id,
+  questionKey,
+  answer
+) {
+
+  const trainee =
+    findTrainee(id);
+
+
+  if (!trainee) {
+    return;
+  }
+
+
+  if (!trainee.answers) {
+
+    trainee.answers = {};
+
+  }
+
+
+  if (!trainee.randomComments) {
+
+    trainee.randomComments = {};
+
+  }
+
+
+  const previousAnswer =
+    trainee.answers[
+      questionKey
+    ];
+
+
+  if (
+    previousAnswer === answer
+  ) {
+
+    delete trainee.answers[
+      questionKey
+    ];
+
+
+    delete trainee.randomComments[
+      questionKey
+    ];
+
+
+    if (
+      questionKey === "understanding"
+    ) {
+
+      trainee.understandingProgress =
+        "";
+
+      trainee.caseType =
+        "";
+
+
+      delete trainee.randomComments[
+        "understandingProgress"
+      ];
+
+
+      delete trainee.randomComments[
+        "caseType"
+      ];
+
     }
 
-    trainee.camera =
+  } else {
+
+    trainee.answers[
+      questionKey
+    ] = answer;
+
+
+    trainee.randomComments[
+      questionKey
+    ] =
+      getRandomComment(
+        questionKey,
+        answer,
+        trainee.randomComments[
+          questionKey
+        ]
+      );
+
+
+    if (
+      questionKey === "understanding"
+    ) {
+
+      trainee.understandingProgress =
+        "";
+
+      trainee.caseType =
+        "";
+
+
+      delete trainee.randomComments[
+        "understandingProgress"
+      ];
+
+
+      delete trainee.randomComments[
+        "caseType"
+      ];
+
+    }
+
+  }
+
+
+  saveData();
+
+  updateFeedbackUI(id);
+
+  updatePreview(id);
+
+}
+
+
+function setUnderstandingProgress(
+  id,
+  value
+) {
+
+  const trainee =
+    findTrainee(id);
+
+
+  if (!trainee) {
+    return;
+  }
+
+
+  const understanding =
+    trainee.answers &&
+    trainee.answers.understanding;
+
+
+  if (
+    understanding !== "good" &&
+    understanding !== "bad"
+  ) {
+
+    return;
+
+  }
+
+
+  const validValues = [
+    "good_performance",
+    "select_cases",
+    "improved",
+    "bad_performance",
+    "declined"
+  ];
+
+
+  if (
+    !validValues.includes(value)
+  ) {
+
+    return;
+
+  }
+
+
+  const previous =
+    trainee.understandingProgress;
+
+
+  if (
+    previous === value
+  ) {
+
+    trainee.understandingProgress =
+      "";
+
+
+    trainee.caseType =
+      "";
+
+
+    if (
+      trainee.randomComments
+    ) {
+
+      delete trainee.randomComments[
+        "understandingProgress"
+      ];
+
+      delete trainee.randomComments[
+        "caseType"
+      ];
+
+    }
+
+  } else {
+
+    trainee.understandingProgress =
       value;
 
-    delete trainee.randomComments.camera;
 
-    saveData();
+    /*
+      Case Type is only relevant when
+      Select Cases is selected.
+    */
 
-    renderCardBody(id);
-
-    updatePreview(id);
-
-  }
-
-
-  /* =========================================================
-     SET FEEDBACK ANSWER
-     ========================================================= */
-
-  function setFeedbackAnswer(
-    id,
-    questionKey,
-    answer
-  ) {
-
-    const trainee =
-      findTrainee(id);
-
-
-    if (!trainee) {
-      return;
-    }
-
-
-    if (!trainee.answers) {
-
-      trainee.answers = {};
-
-    }
+    trainee.caseType =
+      "";
 
 
     if (!trainee.randomComments) {
@@ -2872,149 +3340,16 @@ const cameraComments = {
     }
 
 
-    const previousAnswer =
-      trainee.answers[
-        questionKey
-      ];
+    delete trainee.randomComments.caseType;
 
 
-    if (
-      previousAnswer === answer
-    ) {
-
-      delete trainee.answers[
-        questionKey
-      ];
-
+    if (value === "select_cases") {
 
       delete trainee.randomComments[
-        questionKey
+        "understandingProgress"
       ];
 
-
-      if (
-        questionKey === "understanding"
-      ) {
-
-        trainee.understandingProgress =
-          "";
-
-        delete trainee.randomComments[
-          "understandingProgress"
-        ];
-
-      }
-
     } else {
-
-      trainee.answers[
-        questionKey
-      ] = answer;
-
-
-      trainee.randomComments[
-        questionKey
-      ] =
-        getRandomComment(
-          questionKey,
-          answer,
-          trainee.randomComments[
-            questionKey
-          ]
-        );
-
-
-      if (
-        questionKey === "understanding"
-      ) {
-
-        trainee.understandingProgress =
-          "";
-
-        delete trainee.randomComments[
-          "understandingProgress"
-        ];
-
-      }
-
-    }
-
-
-    saveData();
-
-    updateFeedbackUI(id);
-
-    updatePreview(id);
-
-  }
-
-
-  /* =========================================================
-     UNDERSTANDING FOLLOW-UP
-     ========================================================= */
-
-  function setUnderstandingProgress(
-    id,
-    value
-  ) {
-
-    const trainee =
-      findTrainee(id);
-
-
-    if (!trainee) {
-      return;
-    }
-
-
-    const understanding =
-      trainee.answers &&
-      trainee.answers.understanding;
-
-
-    if (
-      understanding !== "good" &&
-      understanding !== "bad"
-    ) {
-
-      return;
-
-    }
-
-
-    const previous =
-      trainee.understandingProgress;
-
-
-    if (
-      previous === value
-    ) {
-
-      trainee.understandingProgress =
-        "";
-
-      if (
-        trainee.randomComments
-      ) {
-
-        delete trainee.randomComments[
-          "understandingProgress"
-        ];
-
-      }
-
-    } else {
-
-      trainee.understandingProgress =
-        value;
-
-
-      if (!trainee.randomComments) {
-
-        trainee.randomComments = {};
-
-      }
-
 
       trainee.randomComments[
         "understandingProgress"
@@ -3029,1345 +3364,1713 @@ const cameraComments = {
 
     }
 
-
-    saveData();
-
-    updateFeedbackUI(id);
-
-    updatePreview(id);
-
   }
 
 
-  /* =========================================================
-     UPDATE FEEDBACK UI
-     ========================================================= */
+  saveData();
 
-  function updateFeedbackUI(
-    id
-  ) {
+  updateFeedbackUI(id);
 
-    const trainee =
-      findTrainee(id);
+  updatePreview(id);
+
+}
 
 
-    if (!trainee) {
-      return;
-    }
+function updateFeedbackUI(
+  id
+) {
+
+  const trainee =
+    findTrainee(id);
 
 
-    const card =
-      document.getElementById(
-        "card-" + id
-      );
-
-
-    if (!card) {
-      return;
-    }
-
-
-    const questionList =
-      card.querySelector(
-        ".question-list"
-      );
-
-
-    if (questionList) {
-
-      questionList.innerHTML =
-        renderFeedbackQuestions(
-          trainee
-        );
-
-    }
-
+  if (!trainee) {
+    return;
   }
 
 
-  /* =========================================================
-     TOGGLE TRAINEE
-     ========================================================= */
-
-  function toggleTrainee(id) {
-
-    const trainee =
-      findTrainee(id);
+  const card =
+    document.getElementById(
+      "card-" + id
+    );
 
 
-    if (!trainee) {
-      return;
-    }
-
-
-    trainee.open =
-      !trainee.open;
-
-
-    saveData();
-
-    render();
-
+  if (!card) {
+    return;
   }
 
 
-  /* =========================================================
-     UPDATE NAME
-     ========================================================= */
+  const questionList =
+    card.querySelector(
+      ".question-list"
+    );
 
-  function updateName(
-    id,
-    value
-  ) {
 
-    const trainee =
-      findTrainee(id);
+  if (questionList) {
 
-
-    if (!trainee) {
-      return;
-    }
-
-
-    trainee.name =
-      value;
-
-
-    saveData();
-
-
-    const title =
-      document.querySelector(
-        "#card-" +
-        id +
-        " .trainee-name-title"
-      );
-
-
-    if (title) {
-
-      title.textContent =
-        value.trim() ||
-        "Unnamed Trainee";
-
-    }
-
-  }
-
-
-  /* =========================================================
-     UPDATE FIELD
-     ========================================================= */
-
-  function updateField(
-    id,
-    field,
-    value
-  ) {
-
-    const trainee =
-      findTrainee(id);
-
-
-    if (!trainee) {
-      return;
-    }
-
-
-    trainee[field] =
-      value;
-
-
-    saveData();
-
-    updatePreview(id);
-
-  }
-
-
-  /* =========================================================
-     UPDATE CUSTOM
-     ========================================================= */
-
-  function updateCustom(
-    id,
-    value
-  ) {
-
-    const trainee =
-      findTrainee(id);
-
-
-    if (!trainee) {
-      return;
-    }
-
-
-    trainee.custom =
-      value;
-
-
-    saveData();
-
-    updatePreview(id);
-
-  }
-
-
-  /* =========================================================
-     ATTENDANCE TOGGLE
-     ========================================================= */
-
-  function toggleAttendance(
-    id,
-    field,
-    checked
-  ) {
-
-    const trainee =
-      findTrainee(id);
-
-
-    if (!trainee) {
-      return;
-    }
-
-
-    trainee[field] =
-      checked;
-
-
-    saveData();
-
-    renderCardBody(id);
-
-  }
-
-
-  /* =========================================================
-     ATTENDANCE COUNT
-     ========================================================= */
-
-  function updateAttendanceCount(
-    id,
-    field,
-    value
-  ) {
-
-    const trainee =
-      findTrainee(id);
-
-
-    if (!trainee) {
-      return;
-    }
-
-
-    trainee[field] =
-      normalizeCount(
-        value
-      );
-
-
-    saveData();
-
-    updateAttendanceLabels(id);
-
-    updatePreview(id);
-
-  }
-
-
-  /* =========================================================
-     UPDATE ATTENDANCE LABELS
-     ========================================================= */
-
-  function updateAttendanceLabels(
-    id
-  ) {
-
-    const trainee =
-      findTrainee(id);
-
-
-    if (!trainee) {
-      return;
-    }
-
-
-    const tardyWord =
-      document.getElementById(
-        "tardy-word-" + id
-      );
-
-
-    const absentWord =
-      document.getElementById(
-        "absent-word-" + id
-      );
-
-
-    if (tardyWord) {
-
-      tardyWord.textContent =
-        trainee.tardyEnabled
-          ? numberToWords(
-              normalizeCount(
-                trainee.tardyCount
-              )
-            )
-          : "";
-
-    }
-
-
-    if (absentWord) {
-
-      absentWord.textContent =
-        trainee.absentEnabled
-          ? numberToWords(
-              normalizeCount(
-                trainee.absentCount
-              )
-            )
-          : "";
-
-    }
-
-  }
-
-
-  /* =========================================================
-     RENDER CARD BODY
-     ========================================================= */
-
-  function renderCardBody(
-    id
-  ) {
-
-    const trainee =
-      findTrainee(id);
-
-
-    if (!trainee) {
-      return;
-    }
-
-
-    const wasOpen =
-      trainee.open;
-
-
-    render();
-
-
-    const updatedCard =
-      document.getElementById(
-        "card-" + id
-      );
-
-
-    if (updatedCard) {
-
-      trainee.open =
-        wasOpen;
-
-
-      updatedCard.classList.toggle(
-        "open",
-        wasOpen
-      );
-
-    }
-
-  }
-
-
-  /* =========================================================
-     GENERATE FEEDBACK
-
-     IMPORTANT:
-     He/She is added ONLY ONCE.
-
-     All feedback phrases after He/She are collected
-     and shuffled so the feedback does not always start
-     with the same fixed sentence.
-
-     Example:
-
-     He communicated clearly during role plays,
-     passed the final quiz successfully,
-     showed positive interaction throughout the session,
-     kept the camera on during training,
-     applied the trainer's feedback during activities.
-
-     Instead of always:
-
-     He passed the final quiz successfully,
-     completed all daily quizzes successfully,
-     ...
-     ========================================================= */
-
-  function generateFeedback(
-    trainee
-  ) {
-
-    if (!trainee) {
-      return "";
-    }
-
-
-    const hasActualFeedback =
-      (
-        trainee.answers &&
-        Object.keys(
-          trainee.answers
-        ).length > 0
-      ) ||
-      trainee.custom.trim() !== "" ||
-      trainee.tardyEnabled ||
-      trainee.absentEnabled ||
-      trainee.camera !== "";
-
-
-    if (!hasActualFeedback) {
-      return "";
-    }
-
-
-    const pronoun =
-      trainee.gender === "She"
-        ? "She"
-        : "He";
-
-
-    /*
-      Everything after He/She goes into this array.
-      The array will be shuffled before the final sentence
-      is created.
-    */
-
-    const feedbackParts = [];
-
-
-    /* FINAL QUIZ */
-
-    if (
-      trainee.finalQuiz === "Passed"
-    ) {
-
-      feedbackParts.push(
-        "passed the final quiz successfully"
-      );
-
-    } else {
-
-      feedbackParts.push(
-        "did not pass the final quiz"
-      );
-
-    }
-
-
-    /* DAILY QUIZZES */
-
-    if (
-      trainee.dailyQuiz ===
-      "Completed all daily quizzes successfully"
-    ) {
-
-      feedbackParts.push(
-        "completed all daily quizzes successfully"
-      );
-
-    } else {
-
-      feedbackParts.push(
-        "missed daily quizzes, coaching was provided"
-      );
-
-    }
-
-
-    /* CAMERA */
-
-    if (trainee.camera) {
-
-      const cameraType =
-        trainee.camera === "always"
-          ? "good"
-          : "bad";
-
-
-      if (!trainee.randomComments) {
-
-        trainee.randomComments = {};
-
-      }
-
-
-      let cameraComment =
-        trainee.randomComments.camera;
-
-
-      if (!cameraComment) {
-
-        cameraComment =
-          getRandomFromPool(
-            `camera_${cameraType}`,
-            cameraComments[cameraType],
-            null
-          );
-
-
-        trainee.randomComments.camera =
-          cameraComment;
-
-      }
-
-
-      if (
-        cameraComment &&
-        cameraComment.trim()
-      ) {
-
-        feedbackParts.push(
-          cameraComment.trim()
-        );
-
-      }
-
-    }
-
-
-    /* FEEDBACK QUESTIONS */
-
-    if (
-      trainee.answers &&
-      typeof trainee.answers === "object"
-    ) {
-
-      feedbackQuestions.forEach(
-        function(question) {
-
-          const answer =
-            trainee.answers[
-              question.key
-            ];
-
-
-          if (
-            answer !== "good" &&
-            answer !== "bad"
-          ) {
-
-            return;
-
-          }
-
-
-          let comment = "";
-
-
-          if (
-            trainee.randomComments &&
-            trainee.randomComments[
-              question.key
-            ]
-          ) {
-
-            comment =
-              trainee.randomComments[
-                question.key
-              ];
-
-          }
-
-
-          if (!comment) {
-
-            comment =
-              getRandomComment(
-                question.key,
-                answer
-              );
-
-
-            if (!trainee.randomComments) {
-
-              trainee.randomComments = {};
-
-            }
-
-
-            trainee.randomComments[
-              question.key
-            ] =
-              comment;
-
-          }
-
-
-          if (
-            comment &&
-            comment.trim()
-          ) {
-
-            feedbackParts.push(
-              comment.trim()
-            );
-
-          }
-
-
-          /* UNDERSTANDING PERFORMANCE */
-
-          if (
-            question.key === "understanding" &&
-            trainee.understandingProgress
-          ) {
-
-            const progressComment =
-              trainee.randomComments &&
-              trainee.randomComments[
-                "understandingProgress"
-              ]
-                ? trainee.randomComments[
-                    "understandingProgress"
-                  ]
-                : "";
-
-
-            if (
-              progressComment &&
-              progressComment.trim()
-            ) {
-
-              feedbackParts.push(
-                progressComment.trim()
-              );
-
-            }
-
-          }
-
-        }
-      );
-
-    }
-
-
-    /* ATTENDANCE */
-
-    const attendance =
-      buildAttendanceComment(
+    questionList.innerHTML =
+      renderFeedbackQuestions(
         trainee
       );
 
+  }
 
-    if (attendance) {
-
-      feedbackParts.push(
-        attendance
-      );
-
-    }
+}
 
 
-    /*
-      RANDOMIZE ALL AUTOMATIC FEEDBACK PHRASES.
+function toggleTrainee(id) {
 
-      He/She stays fixed at the beginning.
-      Everything else can appear in a different order.
-    */
-
-    const shuffledParts =
-      shuffleArray(
-        feedbackParts
-      );
+  const trainee =
+    findTrainee(id);
 
 
-    /*
-      CUSTOM COMMENT stays at the end because it is
-      user-written text and may contain its own sentence
-      structure.
-    */
-
-    if (
-      trainee.custom &&
-      trainee.custom.trim()
-    ) {
-
-      shuffledParts.push(
-        trainee.custom.trim()
-      );
-
-    }
-
-
-    if (!shuffledParts.length) {
-      return "";
-    }
-
-
-    let result =
-      pronoun +
-      " " +
-      shuffledParts
-        .filter(
-          function(part) {
-
-            return String(part)
-              .trim() !== "";
-
-          }
-        )
-        .join(", ");
-
-
-    result =
-      result.trim();
-
-
-    result =
-      result.replace(
-        /[.!?]+$/,
-        ""
-      );
-
-
-    if (result) {
-
-      result += ".";
-
-    }
-
-
-    return result;
-
+  if (!trainee) {
+    return;
   }
 
 
-  /* =========================================================
-     ATTENDANCE COMMENT
-     ========================================================= */
+  trainee.open =
+    !trainee.open;
 
-  function buildAttendanceComment(
-    trainee
-  ) {
 
-    const tardy =
+  saveData();
+
+  render();
+
+}
+
+
+function updateName(
+  id,
+  value
+) {
+
+  const trainee =
+    findTrainee(id);
+
+
+  if (!trainee) {
+    return;
+  }
+
+
+  trainee.name =
+    value;
+
+
+  saveData();
+
+
+  const title =
+    document.querySelector(
+      "#card-" +
+      id +
+      " .trainee-name-title"
+    );
+
+
+  if (title) {
+
+    title.textContent =
+      value.trim() ||
+      "Unnamed Trainee";
+
+  }
+
+}
+
+
+function updateField(
+  id,
+  field,
+  value
+) {
+
+  const trainee =
+    findTrainee(id);
+
+
+  if (!trainee) {
+    return;
+  }
+
+
+  trainee[field] =
+    value;
+
+
+  saveData();
+
+  updatePreview(id);
+
+}
+
+
+function updateCustom(
+  id,
+  value
+) {
+
+  const trainee =
+    findTrainee(id);
+
+
+  if (!trainee) {
+    return;
+  }
+
+
+  trainee.custom =
+    value;
+
+
+  saveData();
+
+  updatePreview(id);
+
+}
+
+
+function toggleAttendance(
+  id,
+  field,
+  checked
+) {
+
+  const trainee =
+    findTrainee(id);
+
+
+  if (!trainee) {
+    return;
+  }
+
+
+  trainee[field] =
+    checked;
+
+
+  saveData();
+
+  renderCardBody(id);
+
+}
+
+
+function updateAttendanceCount(
+  id,
+  field,
+  value
+) {
+
+  const trainee =
+    findTrainee(id);
+
+
+  if (!trainee) {
+    return;
+  }
+
+
+  trainee[field] =
+    normalizeCount(
+      value
+    );
+
+
+  saveData();
+
+  updateAttendanceLabels(id);
+
+  updatePreview(id);
+
+}
+
+
+function updateAttendanceLabels(
+  id
+) {
+
+  const trainee =
+    findTrainee(id);
+
+
+  if (!trainee) {
+    return;
+  }
+
+
+  const tardyWord =
+    document.getElementById(
+      "tardy-word-" + id
+    );
+
+
+  const absentWord =
+    document.getElementById(
+      "absent-word-" + id
+    );
+
+
+  if (tardyWord) {
+
+    tardyWord.textContent =
       trainee.tardyEnabled
         ? numberToWords(
             normalizeCount(
               trainee.tardyCount
             )
           )
-        : null;
+        : "";
+
+  }
 
 
-    const absent =
+  if (absentWord) {
+
+    absentWord.textContent =
       trainee.absentEnabled
         ? numberToWords(
             normalizeCount(
               trainee.absentCount
             )
           )
-        : null;
+        : "";
+
+  }
+
+}
 
 
-    if (!tardy && !absent) {
-      return "";
-    }
+function renderCardBody(
+  id
+) {
+
+  const trainee =
+    findTrainee(id);
 
 
-    if (tardy && absent) {
-
-      return (
-        "showed lack of commitment due to " +
-        tardy +
-        " tardy and " +
-        absent +
-        " absent"
-      );
-
-    }
+  if (!trainee) {
+    return;
+  }
 
 
-    if (tardy) {
-
-      return (
-        "showed lack of commitment due to " +
-        tardy +
-        " tardy"
-      );
-
-    }
+  const wasOpen =
+    trainee.open;
 
 
-    if (absent) {
-
-      return (
-        "showed lack of commitment due to " +
-        absent +
-        " absent"
-      );
-
-    }
+  render();
 
 
+  const updatedCard =
+    document.getElementById(
+      "card-" + id
+    );
+
+
+  if (updatedCard) {
+
+    trainee.open =
+      wasOpen;
+
+
+    updatedCard.classList.toggle(
+      "open",
+      wasOpen
+    );
+
+  }
+
+}
+
+
+function generateFeedback(
+  trainee
+) {
+
+  if (!trainee) {
     return "";
-
   }
 
 
-  /* =========================================================
-     NUMBER NORMALIZATION
-     ========================================================= */
+  const hasActualFeedback =
+    (
+      trainee.answers &&
+      Object.keys(
+        trainee.answers
+      ).length > 0
+    ) ||
+    trainee.custom.trim() !== "" ||
+    trainee.tardyEnabled ||
+    trainee.absentEnabled ||
+    trainee.camera !== "" ||
+    trainee.caseType !== "";
 
-  function normalizeCount(
-    value
+
+  if (!hasActualFeedback) {
+    return "";
+  }
+
+
+  const pronoun =
+    trainee.gender === "She"
+      ? "She"
+      : "He";
+
+
+  const feedbackParts = [];
+
+
+  if (
+    trainee.finalQuiz === "Passed"
   ) {
 
-    let number =
-      parseInt(
-        value,
-        10
-      );
+    feedbackParts.push(
+      "passed the final quiz successfully"
+    );
 
+  } else {
 
-    if (
-      isNaN(number) ||
-      number < 1
-    ) {
-
-      number = 1;
-
-    }
-
-
-    if (number > 999) {
-
-      number = 999;
-
-    }
-
-
-    return number;
-
-  }
-
-
-  /* =========================================================
-     NUMBER TO WORDS
-     ========================================================= */
-
-  function numberToWords(
-    number
-  ) {
-
-    number =
-      normalizeCount(
-        number
-      );
-
-
-    const ones = [
-
-      "",
-
-      "one",
-
-      "two",
-
-      "three",
-
-      "four",
-
-      "five",
-
-      "six",
-
-      "seven",
-
-      "eight",
-
-      "nine",
-
-      "ten",
-
-      "eleven",
-
-      "twelve",
-
-      "thirteen",
-
-      "fourteen",
-
-      "fifteen",
-
-      "sixteen",
-
-      "seventeen",
-
-      "eighteen",
-
-      "nineteen"
-
-    ];
-
-
-    const tens = [
-
-      "",
-
-      "",
-
-      "twenty",
-
-      "thirty",
-
-      "forty",
-
-      "fifty",
-
-      "sixty",
-
-      "seventy",
-
-      "eighty",
-
-      "ninety"
-
-    ];
-
-
-    if (
-      number < 20
-    ) {
-
-      return ones[number];
-
-    }
-
-
-    if (
-      number < 100
-    ) {
-
-      if (
-        number % 10 === 0
-      ) {
-
-        return tens[
-          Math.floor(
-            number / 10
-          )
-        ];
-
-      }
-
-
-      return (
-        tens[
-          Math.floor(
-            number / 10
-          )
-        ] +
-        "-" +
-        ones[
-          number % 10
-        ]
-      );
-
-    }
-
-
-    if (
-      number < 1000
-    ) {
-
-      const hundred =
-        Math.floor(
-          number / 100
-        );
-
-
-      const remainder =
-        number % 100;
-
-
-      if (
-        remainder === 0
-      ) {
-
-        return (
-          ones[hundred] +
-          " hundred"
-        );
-
-      }
-
-
-      return (
-        ones[hundred] +
-        " hundred " +
-        numberToWords(
-          remainder
-        )
-      );
-
-    }
-
-
-    return String(number);
-
-  }
-
-
-  /* =========================================================
-     UPDATE PREVIEW
-     ========================================================= */
-
-  function updatePreview(
-    id
-  ) {
-
-    const trainee =
-      findTrainee(id);
-
-
-    if (!trainee) {
-      return;
-    }
-
-
-    const preview =
-      document.getElementById(
-        "preview-" + id
-      );
-
-
-    if (preview) {
-
-      preview.textContent =
-        generateFeedback(
-          trainee
-        );
-
-    }
-
-
-    saveData();
-
-  }
-
-
-  /* =========================================================
-     UPDATE ALL PREVIEWS
-     ========================================================= */
-
-  function updateAllPreviews() {
-
-    trainees.forEach(
-      function(trainee) {
-
-        updatePreview(
-          trainee.id
-        );
-
-      }
+    feedbackParts.push(
+      "did not pass the final quiz"
     );
 
   }
 
 
-  /* =========================================================
-     COPY FEEDBACK
-     ========================================================= */
-
-  function copyFeedback(
-    id
+  if (
+    trainee.dailyQuiz ===
+    "Completed all daily quizzes successfully"
   ) {
 
-    const trainee =
-      findTrainee(id);
+    feedbackParts.push(
+      "completed all daily quizzes successfully"
+    );
 
+  } else {
 
-    if (!trainee) {
-      return;
-    }
-
-
-    const text =
-      generateFeedback(
-        trainee
-      );
-
-
-    if (!text.trim()) {
-
-      showToast(
-        "There is no feedback to copy."
-      );
-
-      return;
-
-    }
-
-
-    copyText(
-      text
+    feedbackParts.push(
+      "missed daily quizzes, coaching was provided"
     );
 
   }
 
 
-  /* =========================================================
-     COPY ALL
-     ========================================================= */
+  if (trainee.camera) {
 
-  function copyAllFeedback() {
+    const cameraType =
+      trainee.camera === "always"
+        ? "good"
+        : "bad";
 
-    if (!trainees.length) {
 
-      showToast(
-        "No trainees available."
-      );
+    if (!trainee.randomComments) {
 
-      return;
+      trainee.randomComments = {};
 
     }
 
 
-    const blocks =
-      trainees
-        .map(
-          function(trainee) {
-
-            const feedback =
-              generateFeedback(
-                trainee
-              );
+    let cameraComment =
+      trainee.randomComments.camera;
 
 
-            if (!feedback.trim()) {
-              return "";
-            }
+    if (!cameraComment) {
+
+      cameraComment =
+        getRandomFromPool(
+          `camera_${cameraType}`,
+          cameraComments[cameraType],
+          null
+        );
 
 
-            return (
-              trainee.name.trim() +
-              ":\n" +
-              feedback
+      trainee.randomComments.camera =
+        cameraComment;
+
+    }
+
+
+    if (
+      cameraComment &&
+      cameraComment.trim()
+    ) {
+
+      feedbackParts.push(
+        cameraComment.trim()
+      );
+
+    }
+
+  }
+
+
+  if (
+    trainee.answers &&
+    typeof trainee.answers === "object"
+  ) {
+
+    feedbackQuestions.forEach(
+      function(question) {
+
+        const answer =
+          trainee.answers[
+            question.key
+          ];
+
+
+        if (
+          answer !== "good" &&
+          answer !== "bad"
+        ) {
+
+          return;
+
+        }
+
+
+        let comment = "";
+
+
+        if (
+          trainee.randomComments &&
+          trainee.randomComments[
+            question.key
+          ]
+        ) {
+
+          comment =
+            trainee.randomComments[
+              question.key
+            ];
+
+        }
+
+
+        if (!comment) {
+
+          comment =
+            getRandomComment(
+              question.key,
+              answer
+            );
+
+
+          if (!trainee.randomComments) {
+
+            trainee.randomComments = {};
+
+          }
+
+
+          trainee.randomComments[
+            question.key
+          ] =
+            comment;
+
+        }
+
+
+        if (
+          comment &&
+          comment.trim()
+        ) {
+
+          feedbackParts.push(
+            comment.trim()
+          );
+
+        }
+
+
+        if (
+          question.key === "understanding" &&
+          trainee.understandingProgress &&
+          trainee.understandingProgress !==
+          "select_cases"
+        ) {
+
+          const progressComment =
+            trainee.randomComments &&
+            trainee.randomComments[
+              "understandingProgress"
+            ]
+              ? trainee.randomComments[
+                  "understandingProgress"
+                ]
+              : "";
+
+
+          if (
+            progressComment &&
+            progressComment.trim()
+          ) {
+
+            feedbackParts.push(
+              progressComment.trim()
             );
 
           }
-        )
-        .filter(
-          function(block) {
 
-            return block !== "";
+        }
+
+
+        if (
+          question.key === "understanding" &&
+          (answer === "good" || answer === "bad") &&
+          trainee.understandingProgress ===
+          "select_cases" &&
+          trainee.caseType
+        ) {
+
+          let caseComment =
+            trainee.randomComments &&
+            trainee.randomComments.caseType
+              ? trainee.randomComments.caseType
+              : "";
+
+
+          if (!caseComment) {
+
+            const pool =
+              caseTypeComments[
+                trainee.caseType
+              ] &&
+              caseTypeComments[
+                trainee.caseType
+              ][
+                answer
+              ];
+
+
+            if (pool && pool.length) {
+
+              caseComment =
+                getRandomFromPool(
+                  "caseType_" +
+                  trainee.caseType +
+                  "_" +
+                  answer,
+                  pool,
+                  null
+                );
+
+
+              if (!trainee.randomComments) {
+
+                trainee.randomComments = {};
+
+              }
+
+
+              trainee.randomComments.caseType =
+                caseComment;
+
+            }
 
           }
-        );
 
 
-    if (!blocks.length) {
+          if (
+            caseComment &&
+            caseComment.trim()
+          ) {
 
-      showToast(
-        "There is no feedback to copy."
-      );
+            feedbackParts.push(
+              caseComment.trim()
+            );
 
-      return;
+          }
+
+        }
+
+      }
+    );
+
+  }
+
+
+  const attendance =
+    buildAttendanceComment(
+      trainee
+    );
+
+
+  if (attendance) {
+
+    feedbackParts.push(
+      attendance
+    );
+
+  }
+
+
+  const shuffledParts =
+    shuffleArray(
+      feedbackParts
+    );
+
+
+  if (
+    trainee.custom &&
+    trainee.custom.trim()
+  ) {
+
+    shuffledParts.push(
+      trainee.custom.trim()
+    );
+
+  }
+
+
+  if (!shuffledParts.length) {
+    return "";
+  }
+
+
+  let result =
+    pronoun +
+    " " +
+    shuffledParts
+      .filter(
+        function(part) {
+
+          return String(part)
+            .trim() !== "";
+
+        }
+      )
+      .join(", ");
+
+
+  result =
+    result.trim();
+
+
+  result =
+    result.replace(
+      /[.!?]+$/,
+      ""
+    );
+
+
+  if (result) {
+
+    result += ".";
+
+  }
+
+
+  return result;
+
+}
+
+
+function buildAttendanceComment(
+  trainee
+) {
+
+  const tardy =
+    trainee.tardyEnabled
+      ? numberToWords(
+          normalizeCount(
+            trainee.tardyCount
+          )
+        )
+      : null;
+
+
+  const absent =
+    trainee.absentEnabled
+      ? numberToWords(
+          normalizeCount(
+            trainee.absentCount
+          )
+        )
+      : null;
+
+
+  if (!tardy && !absent) {
+    return "";
+  }
+
+
+  if (tardy && absent) {
+
+    return (
+      "showed lack of commitment due to " +
+      tardy +
+      " tardy and " +
+      absent +
+      " absent"
+    );
+
+  }
+
+
+  if (tardy) {
+
+    return (
+      "showed lack of commitment due to " +
+      tardy +
+      " tardy"
+    );
+
+  }
+
+
+  if (absent) {
+
+    return (
+      "showed lack of commitment due to " +
+      absent +
+      " absent"
+    );
+
+  }
+
+
+  return "";
+
+}
+
+
+function normalizeCount(
+  value
+) {
+
+  let number =
+    parseInt(
+      value,
+      10
+    );
+
+
+  if (
+    isNaN(number) ||
+    number < 1
+  ) {
+
+    number = 1;
+
+  }
+
+
+  if (number > 999) {
+
+    number = 999;
+
+  }
+
+
+  return number;
+
+}
+
+
+function numberToWords(
+  number
+) {
+
+  number =
+    normalizeCount(
+      number
+    );
+
+
+  const ones = [
+
+    "",
+
+    "one",
+
+    "two",
+
+    "three",
+
+    "four",
+
+    "five",
+
+    "six",
+
+    "seven",
+
+    "eight",
+
+    "nine",
+
+    "ten",
+
+    "eleven",
+
+    "twelve",
+
+    "thirteen",
+
+    "fourteen",
+
+    "fifteen",
+
+    "sixteen",
+
+    "seventeen",
+
+    "eighteen",
+
+    "nineteen"
+
+  ];
+
+
+  const tens = [
+
+    "",
+
+    "",
+
+    "twenty",
+
+    "thirty",
+
+    "forty",
+
+    "fifty",
+
+    "sixty",
+
+    "seventy",
+
+    "eighty",
+
+    "ninety"
+
+  ];
+
+
+  if (
+    number < 20
+  ) {
+
+    return ones[number];
+
+  }
+
+
+  if (
+    number < 100
+  ) {
+
+    if (
+      number % 10 === 0
+    ) {
+
+      return tens[
+        Math.floor(
+          number / 10
+        )
+      ];
 
     }
 
 
-    copyText(
-      blocks.join(
-        "\n\n"
+    return (
+      tens[
+        Math.floor(
+          number / 10
+        )
+      ] +
+      "-" +
+      ones[
+        number % 10
+      ]
+    );
+
+  }
+
+
+  if (
+    number < 1000
+  ) {
+
+    const hundred =
+      Math.floor(
+        number / 100
+      );
+
+
+    const remainder =
+      number % 100;
+
+
+    if (
+      remainder === 0
+    ) {
+
+      return (
+        ones[hundred] +
+        " hundred"
+      );
+
+    }
+
+
+    return (
+      ones[hundred] +
+      " hundred " +
+      numberToWords(
+        remainder
       )
     );
 
   }
 
 
-  /* =========================================================
-     COPY TEXT
-     ========================================================= */
+  return String(number);
 
-  function copyText(
-    text
-  ) {
-
-    if (
-      navigator.clipboard &&
-      navigator.clipboard.writeText
-    ) {
-
-      navigator.clipboard
-        .writeText(
-          text
-        )
-        .then(
-          function() {
-
-            showToast(
-              "Copied successfully."
-            );
-
-          }
-        )
-        .catch(
-          function() {
-
-            fallbackCopy(
-              text
-            );
-
-          }
-        );
-
-      return;
-
-    }
+}
 
 
-    fallbackCopy(
-      text
-    );
+function updatePreview(
+  id
+) {
 
+  const trainee =
+    findTrainee(id);
+
+
+  if (!trainee) {
+    return;
   }
 
 
-  /* =========================================================
-     FALLBACK COPY
-     ========================================================= */
-
-  function fallbackCopy(
-    text
-  ) {
-
-    const textarea =
-      document.createElement(
-        "textarea"
-      );
-
-
-    textarea.value =
-      text;
-
-
-    textarea.style.position =
-      "fixed";
-
-
-    textarea.style.left =
-      "-9999px";
-
-
-    document.body.appendChild(
-      textarea
+  const preview =
+    document.getElementById(
+      "preview-" + id
     );
 
 
-    textarea.select();
+  if (preview) {
 
-
-    try {
-
-      document.execCommand(
-        "copy"
-      );
-
-
-      showToast(
-        "Copied successfully."
-      );
-
-    } catch (error) {
-
-      showToast(
-        "Copy failed. Please copy manually."
-      );
-
-    }
-
-
-    document.body.removeChild(
-      textarea
-    );
-
-  }
-
-
-  /* =========================================================
-     CLEAR TRAINEE
-     ========================================================= */
-
-  function clearTrainee(
-    id
-  ) {
-
-    const trainee =
-      findTrainee(id);
-
-
-    if (!trainee) {
-      return;
-    }
-
-
-    const keepName =
-      trainee.name;
-
-
-    const keepOpen =
-      trainee.open;
-
-
-    const index =
-      trainees.indexOf(
+    preview.textContent =
+      generateFeedback(
         trainee
       );
 
+  }
 
-    trainees[index] =
-      createTrainee(
-        keepName
+
+  saveData();
+
+}
+
+
+function updateAllPreviews() {
+
+  trainees.forEach(
+    function(trainee) {
+
+      updatePreview(
+        trainee.id
+      );
+
+    }
+  );
+
+}
+
+
+function copyFeedback(
+  id
+) {
+
+  const trainee =
+    findTrainee(id);
+
+
+  if (!trainee) {
+    return;
+  }
+
+
+  const text =
+    generateFeedback(
+      trainee
+    );
+
+
+  if (!text.trim()) {
+
+    showToast(
+      "There is no feedback to copy."
+    );
+
+    return;
+
+  }
+
+
+  copyText(
+    text
+  );
+
+}
+
+
+function copyAllFeedback() {
+
+  if (!trainees.length) {
+
+    showToast(
+      "No trainees available."
+    );
+
+    return;
+
+  }
+
+
+  const blocks =
+    trainees
+      .map(
+        function(trainee) {
+
+          const feedback =
+            generateFeedback(
+              trainee
+            );
+
+
+          if (!feedback.trim()) {
+            return "";
+          }
+
+
+          return (
+            trainee.name.trim() +
+            ":\n" +
+            feedback
+          );
+
+        }
+      )
+      .filter(
+        function(block) {
+
+          return block !== "";
+
+        }
       );
 
 
-    trainees[index].open =
-      keepOpen;
+  if (!blocks.length) {
+
+    showToast(
+      "There is no feedback to copy."
+    );
+
+    return;
+
+  }
 
 
-    saveData();
+  copyText(
+    blocks.join(
+      "\n\n"
+    )
+  );
 
-    render();
+}
+
+
+function copyText(
+  text
+) {
+
+  if (
+    navigator.clipboard &&
+    navigator.clipboard.writeText
+  ) {
+
+    navigator.clipboard
+      .writeText(
+        text
+      )
+      .then(
+        function() {
+
+          showToast(
+            "Copied successfully."
+          );
+
+        }
+      )
+      .catch(
+        function() {
+
+          fallbackCopy(
+            text
+          );
+
+        }
+      );
+
+    return;
+
+  }
+
+
+  fallbackCopy(
+    text
+  );
+
+}
+
+
+function fallbackCopy(
+  text
+) {
+
+  const textarea =
+    document.createElement(
+      "textarea"
+    );
+
+
+  textarea.value =
+    text;
+
+
+  textarea.style.position =
+    "fixed";
+
+
+  textarea.style.left =
+    "-9999px";
+
+
+  document.body.appendChild(
+    textarea
+  );
+
+
+  textarea.select();
+
+
+  try {
+
+    document.execCommand(
+      "copy"
+    );
 
 
     showToast(
-      "Trainee feedback cleared."
+      "Copied successfully."
+    );
+
+  } catch (error) {
+
+    showToast(
+      "Copy failed. Please copy manually."
     );
 
   }
 
 
-  /* =========================================================
-     REMOVE TRAINEE
-     ========================================================= */
+  document.body.removeChild(
+    textarea
+  );
 
-  function removeTrainee(
-    id
-  ) {
+}
+
+
+function clearTrainee(
+  id
+) {
+
+  const trainee =
+    findTrainee(id);
+
+
+  if (!trainee) {
+    return;
+  }
+
+
+  const keepName =
+    trainee.name;
+
+
+  const keepOpen =
+    trainee.open;
+
+
+  const index =
+    trainees.indexOf(
+      trainee
+    );
+
+
+  trainees[index] =
+    createTrainee(
+      keepName
+    );
+
+
+  trainees[index].open =
+    keepOpen;
+
+
+  saveData();
+
+  render();
+
+
+  showToast(
+    "Trainee feedback cleared."
+  );
+
+}
+
+
+function removeTrainee(
+  id
+) {
+
+  trainees =
+    trainees.filter(
+      function(trainee) {
+
+        return trainee.id !== id;
+
+      }
+    );
+
+
+  saveData();
+
+  render();
+
+
+  showToast(
+    "Trainee removed."
+  );
+
+}
+
+
+function clearAll() {
+
+  if (!trainees.length) {
+    return;
+  }
+
+
+  const confirmed =
+    confirm(
+      "Are you sure you want to remove all trainees?"
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  trainees = [];
+
+
+  saveData();
+
+  render();
+
+
+  showToast(
+    "All trainees removed."
+  );
+
+}
+
+
+function saveData() {
+
+  try {
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(
+        trainees
+      )
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Could not save data:",
+      error
+    );
+
+  }
+
+}
+
+
+function loadData() {
+
+  try {
+
+    let saved =
+      localStorage.getItem(
+        STORAGE_KEY
+      );
+
+
+    if (!saved) {
+
+      saved =
+        localStorage.getItem(
+          "trainee_feedback_builder_v8"
+        );
+
+    }
+
+
+    if (!saved) {
+
+      saved =
+        localStorage.getItem(
+          "trainee_feedback_builder_v7"
+        );
+
+    }
+
+
+    if (!saved) {
+
+      saved =
+        localStorage.getItem(
+          "trainee_feedback_builder_v6"
+        );
+
+    }
+
+
+    if (!saved) {
+
+      saved =
+        localStorage.getItem(
+          "trainee_feedback_builder_v5"
+        );
+
+    }
+
+
+    if (!saved) {
+
+      trainees = [];
+
+      return;
+
+    }
+
+
+    const parsed =
+      JSON.parse(
+        saved
+      );
+
+
+    if (!Array.isArray(parsed)) {
+
+      trainees = [];
+
+      return;
+
+    }
+
 
     trainees =
-      trainees.filter(
+      parsed.map(
         function(trainee) {
 
-          return trainee.id !== id;
+          const answers = {};
+
+
+          if (
+            trainee.answers &&
+            typeof trainee.answers ===
+            "object"
+          ) {
+
+            feedbackQuestions.forEach(
+              function(question) {
+
+                const answer =
+                  trainee.answers[
+                    question.key
+                  ];
+
+
+                if (
+                  answer === "good" ||
+                  answer === "bad"
+                ) {
+
+                  answers[
+                    question.key
+                  ] = answer;
+
+                }
+
+              }
+            );
+
+          }
+
+
+          const randomComments = {};
+
+
+          if (
+            trainee.camera &&
+            trainee.randomComments &&
+            trainee.randomComments.camera
+          ) {
+
+            randomComments.camera =
+              trainee.randomComments.camera;
+
+          }
+
+
+          const savedCaseType =
+            Object.prototype.hasOwnProperty.call(
+              caseTypeComments,
+              trainee.caseType
+            )
+              ? trainee.caseType
+              : "";
+
+
+          if (
+            savedCaseType &&
+            trainee.randomComments &&
+            trainee.randomComments.caseType
+          ) {
+
+            randomComments.caseType =
+              trainee.randomComments.caseType;
+
+          }
+
+
+          feedbackQuestions.forEach(
+            function(question) {
+
+              if (
+                answers[
+                  question.key
+                ] &&
+                trainee.randomComments &&
+                trainee.randomComments[
+                  question.key
+                ]
+              ) {
+
+                randomComments[
+                  question.key
+                ] =
+                  trainee.randomComments[
+                    question.key
+                  ];
+
+              }
+
+            }
+          );
+
+
+          let understandingProgress =
+            trainee.understandingProgress ||
+            "";
+
+
+          if (
+            understandingProgress !==
+            "good_performance" &&
+            understandingProgress !==
+            "select_cases" &&
+            understandingProgress !==
+            "improved" &&
+            understandingProgress !==
+            "bad_performance" &&
+            understandingProgress !==
+            "declined"
+          ) {
+
+            understandingProgress =
+              "";
+
+          }
+
+
+          if (
+            !answers.understanding
+          ) {
+
+            understandingProgress =
+              "";
+
+          }
+
+
+          if (
+            answers.understanding === "good" &&
+            (
+              understandingProgress ===
+              "bad_performance" ||
+              understandingProgress ===
+              "declined"
+            )
+          ) {
+
+            understandingProgress =
+              "";
+
+          }
+
+
+          if (
+            answers.understanding === "bad" &&
+            (
+              understandingProgress ===
+              "good_performance" ||
+              understandingProgress ===
+              "improved"
+            )
+          ) {
+
+            understandingProgress =
+              "";
+
+          }
+
+
+          let loadedCaseType =
+            savedCaseType;
+
+
+          /*
+            Case Type is valid only when
+            Select Cases is selected.
+          */
+
+          if (
+            understandingProgress !==
+            "select_cases"
+          ) {
+
+            loadedCaseType =
+              "";
+
+          }
+
+
+          if (
+            understandingProgress &&
+            understandingProgress !==
+            "select_cases" &&
+            trainee.randomComments &&
+            trainee.randomComments[
+              "understandingProgress"
+            ]
+          ) {
+
+            randomComments[
+              "understandingProgress"
+            ] =
+              trainee.randomComments[
+                "understandingProgress"
+              ];
+
+          }
+
+
+          return {
+
+            id:
+              trainee.id ||
+              createId(),
+
+            name:
+              trainee.name ||
+              "",
+
+            gender:
+              trainee.gender === "She"
+                ? "She"
+                : "He",
+
+            finalQuiz:
+              trainee.finalQuiz ===
+              "Did not pass"
+                ? "Did not pass"
+                : "Passed",
+
+            dailyQuiz:
+              trainee.dailyQuiz ===
+              "missed daily quizzes, coaching was provided"
+                ? "missed daily quizzes, coaching was provided"
+                : "Completed all daily quizzes successfully",
+
+            tardyEnabled:
+              Boolean(
+                trainee.tardyEnabled
+              ),
+
+            tardyCount:
+              normalizeCount(
+                trainee.tardyCount ||
+                1
+              ),
+
+            absentEnabled:
+              Boolean(
+                trainee.absentEnabled
+              ),
+
+            absentCount:
+              normalizeCount(
+                trainee.absentCount ||
+                1
+              ),
+
+            camera:
+              trainee.camera === "always" ||
+              trainee.camera === "sometimes_off"
+                ? trainee.camera
+                : "",
+
+            caseType:
+              loadedCaseType,
+
+            answers:
+              answers,
+
+            randomComments:
+              randomComments,
+
+            understandingProgress:
+              understandingProgress,
+
+            custom:
+              trainee.custom ||
+              "",
+
+            open:
+              false
+
+          };
 
         }
       );
@@ -4375,523 +5078,114 @@ const cameraComments = {
 
     saveData();
 
-    render();
+  } catch (error) {
 
-
-    showToast(
-      "Trainee removed."
+    console.error(
+      "Could not load saved data:",
+      error
     );
-
-  }
-
-
-  /* =========================================================
-     CLEAR ALL
-     ========================================================= */
-
-  function clearAll() {
-
-    if (!trainees.length) {
-      return;
-    }
-
-
-    const confirmed =
-      confirm(
-        "Are you sure you want to remove all trainees?"
-      );
-
-
-    if (!confirmed) {
-      return;
-    }
 
 
     trainees = [];
 
+  }
 
-    saveData();
-
-    render();
+}
 
 
-    showToast(
-      "All trainees removed."
+function escapeHTML(
+  value
+) {
+
+  return String(value)
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
     );
 
-  }
+}
 
 
-  /* =========================================================
-     SAVE
-     ========================================================= */
+function escapeAttribute(
+  value
+) {
 
-  function saveData() {
-
-    try {
-
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(
-          trainees
-        )
-      );
-
-    } catch (error) {
-
-      console.error(
-        "Could not save data:",
-        error
-      );
-
-    }
-
-  }
-
-
-  /* =========================================================
-     LOAD
-     ========================================================= */
-
-  function loadData() {
-
-    try {
-
-      let saved =
-        localStorage.getItem(
-          STORAGE_KEY
-        );
-
-
-      if (!saved) {
-
-        saved =
-          localStorage.getItem(
-            "trainee_feedback_builder_v8"
-          );
-
-      }
-
-
-      if (!saved) {
-
-        saved =
-          localStorage.getItem(
-            "trainee_feedback_builder_v7"
-          );
-
-      }
-
-
-      if (!saved) {
-
-        saved =
-          localStorage.getItem(
-            "trainee_feedback_builder_v6"
-          );
-
-      }
-
-
-      if (!saved) {
-
-        saved =
-          localStorage.getItem(
-            "trainee_feedback_builder_v5"
-          );
-
-      }
-
-
-      if (!saved) {
-
-        trainees = [];
-
-        return;
-
-      }
-
-
-      const parsed =
-        JSON.parse(
-          saved
-        );
-
-
-      if (!Array.isArray(parsed)) {
-
-        trainees = [];
-
-        return;
-
-      }
-
-
-      trainees =
-        parsed.map(
-          function(trainee) {
-
-            const answers = {};
-
-
-            if (
-              trainee.answers &&
-              typeof trainee.answers ===
-              "object"
-            ) {
-
-              feedbackQuestions.forEach(
-                function(question) {
-
-                  const answer =
-                    trainee.answers[
-                      question.key
-                    ];
-
-
-                  if (
-                    answer === "good" ||
-                    answer === "bad"
-                  ) {
-
-                    answers[
-                      question.key
-                    ] = answer;
-
-                  }
-
-                }
-              );
-
-            }
-
-
-            const randomComments = {};
-
-
-            if (
-              trainee.camera &&
-              trainee.randomComments &&
-              trainee.randomComments.camera
-            ) {
-
-              randomComments.camera =
-                trainee.randomComments.camera;
-
-            }
-
-
-            feedbackQuestions.forEach(
-              function(question) {
-
-                if (
-                  answers[
-                    question.key
-                  ] &&
-                  trainee.randomComments &&
-                  trainee.randomComments[
-                    question.key
-                  ]
-                ) {
-
-                  randomComments[
-                    question.key
-                  ] =
-                    trainee.randomComments[
-                      question.key
-                    ];
-
-                }
-
-              }
-            );
-
-
-            let understandingProgress =
-              trainee.understandingProgress ||
-              "";
-
-
-            if (
-              understandingProgress !==
-              "good_performance" &&
-              understandingProgress !==
-              "improved" &&
-              understandingProgress !==
-              "bad_performance" &&
-              understandingProgress !==
-              "declined"
-            ) {
-
-              understandingProgress =
-                "";
-
-            }
-
-
-            if (
-              !answers.understanding
-            ) {
-
-              understandingProgress =
-                "";
-
-            }
-
-
-            if (
-              answers.understanding === "good" &&
-              (
-                understandingProgress ===
-                "bad_performance" ||
-                understandingProgress ===
-                "declined"
-              )
-            ) {
-
-              understandingProgress =
-                "";
-
-            }
-
-
-            if (
-              answers.understanding === "bad" &&
-              (
-                understandingProgress ===
-                "good_performance" ||
-                understandingProgress ===
-                "improved"
-              )
-            ) {
-
-              understandingProgress =
-                "";
-
-            }
-
-
-            if (
-              understandingProgress &&
-              trainee.randomComments &&
-              trainee.randomComments[
-                "understandingProgress"
-              ]
-            ) {
-
-              randomComments[
-                "understandingProgress"
-              ] =
-                trainee.randomComments[
-                  "understandingProgress"
-                ];
-
-            }
-
-
-            return {
-
-              id:
-                trainee.id ||
-                createId(),
-
-              name:
-                trainee.name ||
-                "",
-
-              gender:
-                trainee.gender === "She"
-                  ? "She"
-                  : "He",
-
-              finalQuiz:
-                trainee.finalQuiz ===
-                "Did not pass"
-                  ? "Did not pass"
-                  : "Passed",
-
-              dailyQuiz:
-                trainee.dailyQuiz ===
-                "missed daily quizzes, coaching was provided"
-                  ? "missed daily quizzes, coaching was provided"
-                  : "Completed all daily quizzes successfully",
-
-              tardyEnabled:
-                Boolean(
-                  trainee.tardyEnabled
-                ),
-
-              tardyCount:
-                normalizeCount(
-                  trainee.tardyCount ||
-                  1
-                ),
-
-              absentEnabled:
-                Boolean(
-                  trainee.absentEnabled
-                ),
-
-              absentCount:
-                normalizeCount(
-                  trainee.absentCount ||
-                  1
-                ),
-
-              camera:
-                trainee.camera === "always" ||
-                trainee.camera === "sometimes_off"
-                  ? trainee.camera
-                  : "",
-
-              answers:
-                answers,
-
-              randomComments:
-                randomComments,
-
-              understandingProgress:
-                understandingProgress,
-
-              custom:
-                trainee.custom ||
-                "",
-
-              open:
-                false
-
-            };
-
-          }
-        );
-
-
-      saveData();
-
-    } catch (error) {
-
-      console.error(
-        "Could not load saved data:",
-        error
-      );
-
-
-      trainees = [];
-
-    }
-
-  }
-
-
-  /* =========================================================
-     ESCAPE HTML
-     ========================================================= */
-
-  function escapeHTML(
+  return escapeHTML(
     value
-  ) {
+  );
 
-    return String(value)
-
-      .replace(
-        /&/g,
-        "&amp;"
-      )
-
-      .replace(
-        /</g,
-        "&lt;"
-      )
-
-      .replace(
-        />/g,
-        "&gt;"
-      )
-
-      .replace(
-        /"/g,
-        "&quot;"
-      )
-
-      .replace(
-        /'/g,
-        "&#039;"
-      );
-
-  }
+}
 
 
-  /* =========================================================
-     ESCAPE ATTRIBUTE
-     ========================================================= */
-
-  function escapeAttribute(
-    value
-  ) {
-
-    return escapeHTML(
-      value
-    );
-
-  }
+let toastTimer =
+  null;
 
 
-  /* =========================================================
-     TOAST
-     ========================================================= */
+function showToast(
+  message
+) {
 
-  let toastTimer =
-    null;
-
-
-  function showToast(
-    message
-  ) {
-
-    const toast =
-      document.getElementById(
-        "toast"
-      );
-
-
-    toast.textContent =
-      message;
-
-
-    toast.classList.add(
-      "show"
+  const toast =
+    document.getElementById(
+      "toast"
     );
 
 
-    clearTimeout(
-      toastTimer
+  toast.textContent =
+    message;
+
+
+  toast.classList.add(
+    "show"
+  );
+
+
+  clearTimeout(
+    toastTimer
+  );
+
+
+  toastTimer =
+    setTimeout(
+      function() {
+
+        toast.classList.remove(
+          "show"
+        );
+
+      },
+      2200
     );
 
-
-    toastTimer =
-      setTimeout(
-        function() {
-
-          toast.classList.remove(
-            "show"
-          );
-
-        },
-        2200
-      );
-
-  }
+}
 
 
-  /* =========================================================
-     INITIALIZE
-     ========================================================= */
+loadRandomHistory();
 
-  loadRandomHistory();
+loadData();
 
-  loadData();
-
-  render();
+render();
 
 </script>
 
